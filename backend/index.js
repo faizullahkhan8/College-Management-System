@@ -7,15 +7,15 @@ const port = 4000 || process.env.PORT;
 var cors = require("cors");
 
 app.use(
-  cors({
-    origin: process.env.FRONTEND_API_LINK,
-  })
+    cors({
+        origin: process.env.FRONTEND_API_LINK,
+    }),
 );
 
 app.use(express.json()); //to convert request data to json
 
 app.get("/", (req, res) => {
-  res.send("Hello 👋 I am Working Fine 🚀");
+    res.send("Hello 👋 I am Working Fine 🚀");
 });
 
 app.use("/media", express.static(path.join(__dirname, "media")));
@@ -31,7 +31,8 @@ app.use("/api/timetable", require("./routes/timetable.route"));
 app.use("/api/material", require("./routes/material.route"));
 app.use("/api/exam", require("./routes/exam.route"));
 app.use("/api/marks", require("./routes/marks.route"));
+app.use("/api/attendance", require("./routes/attendance.route"));
 
 app.listen(port, () => {
-  console.log(`Server Listening On http://localhost:${port}`);
+    console.log(`Server Listening On http://localhost:${port}`);
 });
