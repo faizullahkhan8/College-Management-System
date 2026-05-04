@@ -31,15 +31,19 @@ const Home = () => {
   const navigate = useNavigate();
 
   const fetchUserDetails = async () => {
+    console.log("API CALL STARTED"); // 👈 add this
     setIsLoading(true);
+    const toastId = toast.loading("Loading user details...", {
+      duration: 1500
+    });
     try {
-      toast.loading("Loading user details...");
       const response = await axiosWrapper.get(`/student/my-details`, {
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
       });
       if (response.data.success) {
+        console.log("API RESPONSE:", response);
         setProfileData(response.data.data);
         dispatch(setUserData(response.data.data));
       } else {
@@ -52,7 +56,7 @@ const Home = () => {
       );
     } finally {
       setIsLoading(false);
-      toast.dismiss();
+      toast.dismiss(toastId);
     }
   };
 
@@ -67,10 +71,9 @@ const Home = () => {
       font-medium text-sm w-full
       rounded-md
       transition-all duration-300 ease-in-out
-      ${
-        isSelected
-          ? "bg-gradient-to-r from-green-400 to-green-600 text-white shadow-lg transform -translate-y-1"
-          : "bg-green-100 text-green-700 hover:bg-blue-100"
+      ${isSelected
+        ? "bg-gradient-to-r from-green-400 to-green-600 text-white shadow-lg transform -translate-y-1"
+        : "bg-green-100 text-green-700 hover:bg-blue-100"
       }
     `;
   };

@@ -13,7 +13,7 @@ axiosWrapper.interceptors.response.use(
       error.response?.data?.data === null
     ) {
       localStorage.clear();
-      window.location.href = "/";
+      window.location.href = "/login";
     }
     return Promise.reject(error);
   }

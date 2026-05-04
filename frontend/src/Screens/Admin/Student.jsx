@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { toast } from "react-hot-toast";
 import { MdOutlineDelete, MdEdit } from "react-icons/md";
 import { IoMdAdd, IoMdClose } from "react-icons/io";
@@ -8,6 +8,7 @@ import axiosWrapper from "../../utils/AxiosWrapper";
 import CustomButton from "../../components/CustomButton";
 import NoData from "../../components/NoData";
 import { CgDanger } from "react-icons/cg";
+import DataTable from "../../components/DataTable";
 
 const Student = () => {
   const [searchParams, setSearchParams] = useState({
@@ -52,8 +53,35 @@ const Student = () => {
   });
 
   useEffect(() => {
+    getAllStudentsHandler();
     getBranchHandler();
   }, []);
+
+  const getAllStudentsHandler = async () => {
+    setDataLoading(true);
+    try {
+      toast.loading("Loading students...");
+      const response = await axiosWrapper.get(`/student`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      });
+      if (response.data.success) {
+        setStudents(response.data.data || []);
+      } else {
+        toast.error(response.data.message);
+      }
+    } catch (error) {
+      if (error.response?.status === 404) {
+        setStudents([]);
+      } else {
+        toast.error(error.response?.data?.message || "Error fetching students");
+      }
+    } finally {
+      setDataLoading(false);
+      toast.dismiss();
+    }
+  };
 
   const getBranchHandler = async () => {
     try {
@@ -205,6 +233,7 @@ const Student = () => {
           toast.success(response.data.message);
         }
         resetForm();
+        refreshStudentsList();
       } else {
         toast.error(response.data.message);
       }
@@ -265,7 +294,7 @@ const Student = () => {
       if (response.data.success) {
         toast.success("Student has been deleted successfully");
         setIsDeleteConfirmOpen(false);
-        searchStudents({ preventDefault: () => {} });
+        refreshStudentsList();
       } else {
         toast.error(response.data.message);
       }
@@ -305,8 +334,96 @@ const Student = () => {
     setFile(null);
   };
 
+  const refreshStudentsList = async () => {
+    const hasAnyFilter =
+      !!searchParams.enrollmentNo ||
+      !!searchParams.name ||
+      !!searchParams.semester ||
+      !!searchParams.branch;
+
+    if (hasSearched && hasAnyFilter) {
+      try {
+        const response = await axiosWrapper.post(`/student/search`, searchParams, {
+          headers: { Authorization: `Bearer ${userToken}` },
+        });
+        setStudents(response.data.data || []);
+      } catch (error) {
+        setStudents([]);
+      }
+    } else {
+      await getAllStudentsHandler();
+    }
+  };
+
+  const studentColumns = useMemo(
+    () => [
+      {
+        header: "Profile",
+        cell: ({ row }) => {
+          const student = row.original;
+          return (
+            <img
+              src={student.profile}
+              alt={`${student.firstName}'s profile`}
+              className="w-12 h-12 object-cover rounded-full"
+              onError={(e) => {
+                e.target.src =
+                  "https://images.unsplash.com/photo-1744315900478-fa44dc6a4e89?q=80&w=3087&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
+              }}
+            />
+          );
+        },
+      },
+      {
+        header: "Name",
+        cell: ({ row }) => {
+          const s = row.original;
+          return `${s.firstName} ${s.middleName || ""} ${s.lastName}`;
+        },
+      },
+      {
+        header: "E. No",
+        accessorKey: "enrollmentNo",
+      },
+      {
+        header: "Semester",
+        accessorKey: "semester",
+      },
+      {
+        header: "Branch",
+        cell: ({ row }) => row.original.branchId?.name || "-",
+      },
+      {
+        header: "Email",
+        accessorKey: "email",
+      },
+      {
+        header: "Actions",
+        cell: ({ row }) => (
+          <div className="flex justify-center gap-2">
+            <CustomButton
+              variant="secondary"
+              className="!p-2"
+              onClick={() => editStudentHandler(row.original)}
+            >
+              <MdEdit />
+            </CustomButton>
+            <CustomButton
+              variant="danger"
+              className="!p-2"
+              onClick={() => deleteStudentHandler(row.original._id)}
+            >
+              <MdOutlineDelete />
+            </CustomButton>
+          </div>
+        ),
+      },
+    ],
+    []
+  );
+
   return (
-    <div className="w-full mx-auto mt-10 flex justify-center items-start flex-col mb-10">
+    <div className="w-full mx-auto flex justify-center items-start flex-col mb-10">
       <div className="flex justify-between items-center w-full">
         <Heading title="Student Management" />
         {branches.length > 0 && (
@@ -398,90 +515,17 @@ const Student = () => {
             </div>
           </form>
 
-          {!hasSearched && (
-            <div className="text-center mt-8 text-gray-600 flex flex-col items-center justify-center my-10 bg-white p-10 rounded-lg mx-auto w-[40%]">
-              <img
-                src="/assets/filter.svg"
-                alt="Select filters"
-                className="w-64 h-64 mb-4"
-              />
-              Please select at least one filter to search students
-            </div>
-          )}
-
           {hasSearched && students.length === 0 && (
             <NoData title="No students found" />
           )}
 
           {students && students.length > 0 && (
             <div className="mt-8">
-              <h2 className="text-xl font-semibold mb-4">Search Results</h2>
-              <div className="overflow-x-auto">
-                <table className="min-w-full bg-white border border-gray-300">
-                  <thead>
-                    <tr className="bg-gray-100">
-                      <th className="px-6 py-3 border-b text-left">Profile</th>
-                      <th className="px-6 py-3 border-b text-left">Name</th>
-                      <th className="px-6 py-3 border-b text-left">E. No</th>
-                      <th className="px-6 py-3 border-b text-left">Semester</th>
-                      <th className="px-6 py-3 border-b text-left">Branch</th>
-                      <th className="px-6 py-3 border-b text-left">Email</th>
-                      <th className="px-6 py-3 border-b text-center">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {students.map((student) => (
-                      <tr key={student._id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 border-b">
-                          <img
-                            src={`${process.env.REACT_APP_MEDIA_LINK}/${student.profile}`}
-                            alt={`${student.firstName}'s profile`}
-                            className="w-12 h-12 object-cover rounded-full"
-                            onError={(e) => {
-                              e.target.src =
-                                "https://images.unsplash.com/photo-1744315900478-fa44dc6a4e89?q=80&w=3087&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
-                            }}
-                          />
-                        </td>
-                        <td className="px-6 py-4 border-b">
-                          {student.firstName} {student.middleName}{" "}
-                          {student.lastName}
-                        </td>
-                        <td className="px-6 py-4 border-b">
-                          {student.enrollmentNo}
-                        </td>
-                        <td className="px-6 py-4 border-b">
-                          {student.semester}
-                        </td>
-                        <td className="px-6 py-4 border-b">
-                          {student.branchId?.name}
-                        </td>
-                        <td className="px-6 py-4 border-b">{student.email}</td>
-                        <td className="px-6 py-4 border-b text-center">
-                          <div className="flex justify-center gap-2">
-                            <CustomButton
-                              variant="secondary"
-                              className="!p-2"
-                              onClick={() => editStudentHandler(student)}
-                            >
-                              <MdEdit />
-                            </CustomButton>
-                            <CustomButton
-                              variant="danger"
-                              className="!p-2"
-                              onClick={() => deleteStudentHandler(student._id)}
-                            >
-                              <MdOutlineDelete />
-                            </CustomButton>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              <DataTable
+                data={students}
+                columns={studentColumns}
+                pageSize={10}
+              />
             </div>
           )}
         </div>

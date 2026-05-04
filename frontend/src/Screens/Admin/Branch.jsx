@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { toast } from "react-hot-toast";
 import { MdOutlineDelete, MdEdit } from "react-icons/md";
 import { IoMdAdd, IoMdClose } from "react-icons/io";
@@ -7,19 +7,25 @@ import Heading from "../../components/Heading";
 import DeleteConfirm from "../../components/DeleteConfirm";
 import CustomButton from "../../components/CustomButton";
 import Loading from "../../components/Loading";
+import NoData from "../../components/NoData";
+import DataTable from "../../components/DataTable";
 
 const Branch = () => {
   const [data, setData] = useState({
     name: "",
     branchId: "",
   });
-  const [branch, setBranch] = useState();
+  const [searchParams, setSearchParams] = useState({
+    name: "",
+    branchId: "",
+  });
+  const [branch, setBranch] = useState([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [selectedBranchId, setSelectedBranchId] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [dataLoading, setDataLoading] = useState(false);
-  const [processLoading, setProcessLoading] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
 
   useEffect(() => {
     getBranchHandler();
@@ -35,7 +41,7 @@ const Branch = () => {
         },
       });
       if (response.data.success) {
-        setBranch(response.data.data);
+        setBranch(response.data.data || []);
       } else {
         toast.error(response.data.message);
       }
@@ -44,10 +50,70 @@ const Branch = () => {
         setBranch([]);
         return;
       }
-      console.error(error);
       toast.error(error.response?.data?.message || "Error fetching branches");
     } finally {
       setDataLoading(false);
+    }
+  };
+
+  const handleSearchInputChange = (e) => {
+    const { name, value } = e.target;
+    setSearchParams((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const searchBranchHandler = async (e) => {
+    e.preventDefault();
+    if (!searchParams.name && !searchParams.branchId) {
+      toast.error("Please select at least one filter");
+      return;
+    }
+
+    setDataLoading(true);
+    setHasSearched(true);
+    toast.loading("Searching branches...");
+    try {
+      const response = await axiosWrapper.post("/branch/search", searchParams, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+        },
+      });
+      toast.dismiss();
+      if (response.data.success) {
+        setBranch(response.data.data || []);
+      } else {
+        toast.error(response.data.message);
+      }
+    } catch (error) {
+      toast.dismiss();
+      if (error.response?.status === 404) {
+        setBranch([]);
+      } else {
+        toast.error(error.response?.data?.message || "Error searching branches");
+      }
+    } finally {
+      setDataLoading(false);
+    }
+  };
+
+  const refreshBranchList = async () => {
+    const hasAnyFilter = !!searchParams.name || !!searchParams.branchId;
+
+    if (hasSearched && hasAnyFilter) {
+      try {
+        const response = await axiosWrapper.post("/branch/search", searchParams, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+          },
+        });
+        setBranch(response.data.data || []);
+      } catch (error) {
+        setBranch([]);
+      }
+    } else {
+      await getBranchHandler();
     }
   };
 
@@ -65,16 +131,12 @@ const Branch = () => {
       };
       let response;
       if (isEditing) {
-        response = await axiosWrapper.patch(
-          `/branch/${selectedBranchId}`,
-          data,
-          {
-            headers: headers,
-          }
-        );
+        response = await axiosWrapper.patch(`/branch/${selectedBranchId}`, data, {
+          headers,
+        });
       } else {
         response = await axiosWrapper.post(`/branch`, data, {
-          headers: headers,
+          headers,
         });
       }
       toast.dismiss();
@@ -84,27 +146,27 @@ const Branch = () => {
         setShowAddForm(false);
         setIsEditing(false);
         setSelectedBranchId(null);
-        getBranchHandler();
+        refreshBranchList();
       } else {
         toast.error(response.data.message);
       }
     } catch (error) {
       toast.dismiss();
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || "Error");
     }
   };
 
-  const deleteBranchHandler = async (id) => {
+  const deleteBranchHandler = (id) => {
     setIsDeleteConfirmOpen(true);
     setSelectedBranchId(id);
   };
 
-  const editBranchHandler = (branch) => {
+  const editBranchHandler = (branchItem) => {
     setData({
-      name: branch.name,
-      branchId: branch.branchId,
+      name: branchItem.name,
+      branchId: branchItem.branchId,
     });
-    setSelectedBranchId(branch._id);
+    setSelectedBranchId(branchItem._id);
     setIsEditing(true);
     setShowAddForm(true);
   };
@@ -116,28 +178,58 @@ const Branch = () => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${localStorage.getItem("userToken")}`,
       };
-      const response = await axiosWrapper.delete(
-        `/branch/${selectedBranchId}`,
-        {
-          headers: headers,
-        }
-      );
+      const response = await axiosWrapper.delete(`/branch/${selectedBranchId}`, {
+        headers,
+      });
       toast.dismiss();
       if (response.data.success) {
         toast.success("Branch has been deleted successfully");
         setIsDeleteConfirmOpen(false);
-        getBranchHandler();
+        refreshBranchList();
       } else {
         toast.error(response.data.message);
       }
     } catch (error) {
       toast.dismiss();
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || "Error");
     }
   };
 
+  const branchColumns = useMemo(
+    () => [
+      { header: "Branch Name", accessorKey: "name" },
+      { header: "Branch ID", accessorKey: "branchId" },
+      {
+        header: "Created At",
+        cell: ({ row }) => new Date(row.original.createdAt).toLocaleDateString(),
+      },
+      {
+        header: "Actions",
+        cell: ({ row }) => (
+          <div className="flex justify-center gap-4">
+            <CustomButton
+              variant="secondary"
+              className="!p-2"
+              onClick={() => editBranchHandler(row.original)}
+            >
+              <MdEdit />
+            </CustomButton>
+            <CustomButton
+              variant="danger"
+              className="!p-2"
+              onClick={() => deleteBranchHandler(row.original._id)}
+            >
+              <MdOutlineDelete />
+            </CustomButton>
+          </div>
+        ),
+      },
+    ],
+    []
+  );
+
   return (
-    <div className="w-full mx-auto mt-10 flex justify-center items-start flex-col mb-10 relative">
+    <div className="w-full mx-auto flex justify-center items-start flex-col mb-10 relative">
       <Heading title="Branch Details" />
       <CustomButton
         onClick={() => {
@@ -150,11 +242,7 @@ const Branch = () => {
         }}
         className="fixed bottom-8 right-8 !rounded-full !p-4"
       >
-        {showAddForm ? (
-          <IoMdClose className="text-3xl" />
-        ) : (
-          <IoMdAdd className="text-3xl" />
-        )}
+        {showAddForm ? <IoMdClose className="text-3xl" /> : <IoMdAdd className="text-3xl" />}
       </CustomButton>
 
       {dataLoading && <Loading />}
@@ -163,9 +251,7 @@ const Branch = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white rounded-lg w-[500px] max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center p-6 border-b">
-              <h2 className="text-xl font-semibold">
-                {isEditing ? "Edit Branch" : "Add New Branch"}
-              </h2>
+              <h2 className="text-xl font-semibold">{isEditing ? "Edit Branch" : "Add New Branch"}</h2>
               <button
                 onClick={() => setShowAddForm(false)}
                 className="text-gray-500 hover:text-gray-700"
@@ -176,10 +262,7 @@ const Branch = () => {
 
             <form onSubmit={addBranchHandler} className="p-6 space-y-4">
               <div>
-                <label
-                  htmlFor="name"
-                  className="block text-sm font-medium text-gray-700 mb-2"
-                >
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
                   Branch Name
                 </label>
                 <input
@@ -192,28 +275,20 @@ const Branch = () => {
               </div>
 
               <div>
-                <label
-                  htmlFor="branchId"
-                  className="block text-sm font-medium text-gray-700 mb-2"
-                >
+                <label htmlFor="branchId" className="block text-sm font-medium text-gray-700 mb-2">
                   Branch ID
                 </label>
                 <input
                   type="text"
                   id="branchId"
                   value={data.branchId}
-                  onChange={(e) =>
-                    setData({ ...data, branchId: e.target.value })
-                  }
+                  onChange={(e) => setData({ ...data, branchId: e.target.value })}
                   className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
               <div className="flex justify-end gap-4 pt-4 border-t">
-                <CustomButton
-                  variant="secondary"
-                  onClick={() => setShowAddForm(false)}
-                >
+                <CustomButton variant="secondary" onClick={() => setShowAddForm(false)}>
                   Cancel
                 </CustomButton>
                 <CustomButton variant="primary" onClick={addBranchHandler}>
@@ -227,57 +302,48 @@ const Branch = () => {
 
       {!dataLoading && (
         <div className="mt-8 w-full">
-          <table className="text-sm min-w-full bg-white">
-            <thead>
-              <tr className="bg-green-500 text-white">
-                <th className="py-4 px-6 text-left font-semibold">
-                  Branch Name
-                </th>
-                <th className="py-4 px-6 text-left font-semibold">Branch ID</th>
-                <th className="py-4 px-6 text-left font-semibold">
-                  Created At
-                </th>
-                <th className="py-4 px-6 text-center font-semibold">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {branch && branch.length > 0 ? (
-                branch.map((item, index) => (
-                  <tr key={index} className="border-b hover:bg-blue-50">
-                    <td className="py-4 px-6">{item.name}</td>
-                    <td className="py-4 px-6">{item.branchId}</td>
-                    <td className="py-4 px-6">
-                      {new Date(item.createdAt).toLocaleDateString()}
-                    </td>
-                    <td className="py-4 px-6 text-center flex justify-center gap-4">
-                      <CustomButton
-                        variant="secondary"
-                        className="!p-2"
-                        onClick={() => editBranchHandler(item)}
-                      >
-                        <MdEdit />
-                      </CustomButton>
-                      <CustomButton
-                        variant="danger"
-                        className="!p-2"
-                        onClick={() => deleteBranchHandler(item._id)}
-                      >
-                        <MdOutlineDelete />
-                      </CustomButton>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="4" className="text-center text-base pt-10">
-                    No branches found.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+          <form onSubmit={searchBranchHandler} className="flex items-center mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-[90%] mx-auto">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Branch Name</label>
+                <input
+                  type="text"
+                  name="name"
+                  value={searchParams.name}
+                  onChange={handleSearchInputChange}
+                  className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter branch name"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Branch ID</label>
+                <input
+                  type="text"
+                  name="branchId"
+                  value={searchParams.branchId}
+                  onChange={handleSearchInputChange}
+                  className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter branch ID"
+                />
+              </div>
+            </div>
+            <div className="mt-6 flex justify-center w-[10%] mx-auto">
+              <CustomButton type="submit" disabled={dataLoading} variant="primary">
+                {dataLoading ? "Searching..." : "Search"}
+              </CustomButton>
+            </div>
+          </form>
+
+          {hasSearched && branch.length === 0 && <NoData title="No branches found" />}
+
+          {branch.length > 0 && (
+            <div className="mt-8">
+              <DataTable data={branch} columns={branchColumns} pageSize={10} />
+            </div>
+          )}
         </div>
       )}
+
       <DeleteConfirm
         isOpen={isDeleteConfirmOpen}
         onClose={() => setIsDeleteConfirmOpen(false)}

@@ -55,7 +55,7 @@ const registerAdminController = async (req, res, next) => {
   try {
     const { email, phone } = req.body;
 
-    const profile = req.file.filename;
+    const profile = req.file ? req.file.path : null;
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return ApiResponse.badRequest("Invalid email format").send(res);
@@ -163,7 +163,7 @@ const updateDetailsController = async (req, res, next) => {
     }
 
     if (req.file) {
-      updateData.profile = req.file.filename;
+      updateData.profile = req.file.path;
     }
 
     if (updateData.dob) {

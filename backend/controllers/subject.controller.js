@@ -93,9 +93,38 @@ const deleteSubjectController = async (req, res) => {
   }
 };
 
+const searchSubjectController = async (req, res) => {
+  try {
+    const { name, code, branch, semester, credits } = req.body;
+    const query = {};
+
+    if (!name && !code && !branch && !semester && !credits) {
+      return ApiResponse.error("Select at least one filter", 400).send(res);
+    }
+
+    if (name) query.name = { $regex: name, $options: "i" };
+    if (code) query.code = { $regex: code, $options: "i" };
+    if (branch) query.branch = branch;
+    if (semester) query.semester = semester;
+    if (credits) query.credits = credits;
+
+    const subjects = await Subject.find(query).populate("branch");
+    if (!subjects || subjects.length === 0) {
+      return ApiResponse.error("No subjects found", 404).send(res);
+    }
+
+    return ApiResponse.success(subjects, "Subjects found successfully").send(
+      res
+    );
+  } catch (error) {
+    return ApiResponse.error(error.message).send(res);
+  }
+};
+
 module.exports = {
   getSubjectController,
   addSubjectController,
   deleteSubjectController,
   updateSubjectController,
+  searchSubjectController,
 };

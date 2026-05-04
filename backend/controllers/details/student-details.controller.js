@@ -52,7 +52,7 @@ const getAllDetailsController = async (req, res) => {
 
 const registerStudentController = async (req, res) => {
   try {
-    const profile = req.file.path;
+    const profile = req.file ? req.file.path : null;
 
     const enrollmentNo = Math.floor(100000 + Math.random() * 900000);
     const email = `${enrollmentNo}@gmail.com`;

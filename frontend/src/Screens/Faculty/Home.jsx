@@ -1,19 +1,20 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "../../components/Navbar";
 import { toast, Toaster } from "react-hot-toast";
 import Notice from "../Notice";
 import { useDispatch } from "react-redux";
 import { setUserData } from "../../redux/actions";
 import axiosWrapper from "../../utils/AxiosWrapper";
+import { useLocation } from "react-router-dom";
 import Timetable from "./Timetable";
 import Material from "./Material";
 import StudentFinder from "./StudentFinder";
 import Profile from "./Profile";
 import Marks from "./AddMarks";
 import Exam from "../Exam";
+import FacultyDashboard from "./FacultyDashboard";
 
 const MENU_ITEMS = [
-  { id: "home", label: "Home", component: null },
+  { id: "home", label: "Home", component: FacultyDashboard },
   { id: "timetable", label: "Timetable", component: Timetable },
   { id: "material", label: "Material", component: Material },
   { id: "notice", label: "Notice", component: Notice },
@@ -23,9 +24,10 @@ const MENU_ITEMS = [
 ];
 
 const Home = () => {
-  const [selectedMenu, setSelectedMenu] = useState("Home");
+  const [selectedMenu, setSelectedMenu] = useState("home");
   const [profileData, setProfileData] = useState(null);
   const dispatch = useDispatch();
+  const location = useLocation();
   const userToken = localStorage.getItem("userToken");
 
   useEffect(() => {
@@ -47,27 +49,22 @@ const Home = () => {
     fetchUserDetails();
   }, [dispatch, userToken]);
 
-  const getMenuItemClass = (menuId) => {
-    const isSelected = selectedMenu.toLowerCase() === menuId.toLowerCase();
-    return `text-center px-6 py-3 cursor-pointer font-medium text-sm w-full rounded-md ${
-      isSelected
-        ? "bg-green-500 text-white"
-        : "bg-green-50 text-green-700 hover:bg-blue-100"
-    }`;
-  };
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const page = params.get("page") || "home";
+    setSelectedMenu(page.toLowerCase());
+  }, [location.search]);
 
   const renderContent = () => {
-    if (selectedMenu === "Home" && profileData) {
-      return <Profile profileData={profileData} />;
-    }
+
 
     const menuItem = MENU_ITEMS.find(
-      (item) => item.label.toLowerCase() === selectedMenu.toLowerCase()
+      (item) => item.id.toLowerCase() === selectedMenu.toLowerCase()
     );
 
     if (menuItem && menuItem.component) {
       const Component = menuItem.component;
-      return <Component />;
+      return <Component profileData={profileData} />;
     }
 
     return null;
@@ -75,20 +72,7 @@ const Home = () => {
 
   return (
     <>
-      <Navbar />
-      <div className="max-w-7xl mx-auto mt-28">
-        <ul className="flex justify-evenly items-center gap-10 w-full mx-auto my-8">
-          {MENU_ITEMS.map((item) => (
-            <li
-              key={item.id}
-              className={getMenuItemClass(item.id)}
-              onClick={() => setSelectedMenu(item.label)}
-            >
-              {item.label}
-            </li>
-          ))}
-        </ul>
-
+      <div className="max-w-7xl mx-auto">
         {renderContent()}
       </div>
       <Toaster position="bottom-center" />

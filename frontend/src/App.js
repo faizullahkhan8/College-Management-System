@@ -5,6 +5,9 @@ import { Toaster } from "react-hot-toast";
 import mystore from "./redux/store";
 
 import ProtectedRoute from "./components/ProtectedRoute";
+import AdminLayout from "./layouts/AdminLayout";
+import FacultyLayout from "./layouts/FacultyLayout";
+import StudentLayout from "./layouts/StudentLayout";
 
 // ---------- Public Screens ----------
 import Landing from "./Screens/landing";
@@ -18,14 +21,15 @@ import Student from "./Screens/Admin/Student";
 import Faculty from "./Screens/Admin/Faculty";
 import Subject from "./Screens/Admin/Subject";
 import Branch from "./Screens/Admin/Branch";
+import AdminProfile from "./Screens/Admin/Profile";
 
 // ---------- Faculty Screens ----------
 import FacultyHome from "./Screens/Faculty/Home";
-import UploadMarks from "./Screens/Faculty/AddMarks";
+import FacultyProfile from "./Screens/Faculty/Profile";
+import AddMarks from "./Screens/Faculty/AddMarks";
 
 // ---------- Student Screens ----------
 import StudentHome from "./Screens/Student/Home";
-import Profile from "./Screens/Admin/Profile";
 
 const App = () => {
   return (
@@ -48,7 +52,9 @@ const App = () => {
             path="/admin"
             element={
               <ProtectedRoute>
-                <AdminHome />
+                <AdminLayout>
+                  <AdminHome />
+                </AdminLayout>
               </ProtectedRoute>
             }
           />
@@ -56,7 +62,9 @@ const App = () => {
             path="/admin/student"
             element={
               <ProtectedRoute>
-                <Student />
+                <AdminLayout>
+                  <Student />
+                </AdminLayout>
               </ProtectedRoute>
             }
           />
@@ -64,7 +72,9 @@ const App = () => {
             path="/admin/faculty"
             element={
               <ProtectedRoute>
-                <Faculty />
+                <AdminLayout>
+                  <Faculty />
+                </AdminLayout>
               </ProtectedRoute>
             }
           />
@@ -72,7 +82,9 @@ const App = () => {
             path="/admin/subject"
             element={
               <ProtectedRoute>
-                <Subject />
+                <AdminLayout>
+                  <Subject />
+                </AdminLayout>
               </ProtectedRoute>
             }
           />
@@ -80,25 +92,41 @@ const App = () => {
             path="/admin/branch"
             element={
               <ProtectedRoute>
-                <Branch />
+                <AdminLayout>
+                  <Branch />
+                </AdminLayout>
               </ProtectedRoute>
             }
           />
 
           {/* ---------- FACULTY ROUTES ---------- */}
           <Route
-            path="/faculty"
+            path="/faculty/upload-marks"
             element={
               <ProtectedRoute>
-                <FacultyHome />
+                <FacultyLayout>
+                  <AddMarks />
+                </FacultyLayout>
               </ProtectedRoute>
             }
           />
           <Route
-            path="/faculty/upload-marks"
+            path="/faculty/profile"
             element={
               <ProtectedRoute>
-                <UploadMarks />
+                <FacultyLayout>
+                  <FacultyProfile />
+                </FacultyLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/faculty"
+            element={
+              <ProtectedRoute>
+                <FacultyLayout>
+                  <FacultyHome />
+                </FacultyLayout>
               </ProtectedRoute>
             }
           />
@@ -108,7 +136,9 @@ const App = () => {
             path="/student"
             element={
               <ProtectedRoute>
-                <StudentHome />
+                <StudentLayout>
+                  <StudentHome />
+                </StudentLayout>
               </ProtectedRoute>
             }
           />
@@ -118,10 +148,15 @@ const App = () => {
             path="/profile"
             element={
               <ProtectedRoute>
-                <Profile />
+                <AdminLayout>
+                  <AdminProfile />
+                </AdminLayout>
               </ProtectedRoute>
             }
           />
+
+          {/* Catch-all for debugging */}
+          <Route path="*" element={<div className="p-10 text-center">404 - Page Not Found</div>} />
         </Routes>
       </Router>
     </Provider>

@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { toast } from "react-hot-toast";
 import axiosWrapper from "../../utils/AxiosWrapper";
 import Heading from "../../components/Heading";
 import CustomButton from "../../components/CustomButton";
+import DataTable from "../../components/DataTable";
 
 const AddMarks = () => {
   const [branches, setBranches] = useState([]);
@@ -257,6 +258,37 @@ const AddMarks = () => {
     await searchStudents();
   };
 
+  const marksColumns = useMemo(
+    () => [
+      { header: "Enrollment No", accessorKey: "enrollmentNo" },
+      {
+        header: "Student Name",
+        cell: ({ row }) =>
+          `${row.original.firstName || ""} ${row.original.middleName || ""} ${row.original.lastName || ""}`,
+      },
+      {
+        header: "Obtained Marks",
+        cell: ({ row }) => (
+          <input
+            type="number"
+            min={0}
+            max={selectedExam?.totalMarks || 100}
+            className="px-3 py-2 border rounded-md focus:outline-none bg-gray-50 border-gray-200 focus:ring-2 focus:ring-blue-500 w-32"
+            value={marksData[row.original._id] || ""}
+            placeholder="Marks"
+            onChange={(e) =>
+              setMarksData({
+                ...marksData,
+                [row.original._id]: e.target.value,
+              })
+            }
+          />
+        ),
+      },
+    ],
+    [marksData, selectedExam]
+  );
+
   useEffect(() => {
     fetchBranches();
   }, [userToken]);
@@ -274,14 +306,14 @@ const AddMarks = () => {
   }, [selectedSemester]);
 
   return (
-    <div className="w-full mx-auto mt-10 flex justify-center items-start flex-col mb-10">
+    <div className="w-full mx-auto flex justify-center items-start flex-col mb-10">
       <div className="flex justify-between items-center w-full">
         <Heading title="Add Marks" />
       </div>
 
       {showSearch && (
-        <div className="w-full bg-white rounded-lg p-6 mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-[90%] mx-auto">
+        <div className="w-full mt-4">
+          <div className="grid grid-cols-4 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Semester
@@ -329,9 +361,8 @@ const AddMarks = () => {
                 value={selectedSubject?._id || ""}
                 onChange={handleInputChange}
                 disabled={!selectedBranch}
-                className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  !selectedBranch ? "bg-gray-100 cursor-not-allowed" : ""
-                }`}
+                className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${!selectedBranch ? "bg-gray-100 cursor-not-allowed" : ""
+                  }`}
               >
                 <option value="">Select Subject</option>
                 {subjects?.map((subject) => (
@@ -356,9 +387,8 @@ const AddMarks = () => {
                 value={selectedExam?._id || ""}
                 onChange={handleInputChange}
                 disabled={!selectedSubject}
-                className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  !selectedSubject ? "bg-gray-100 cursor-not-allowed" : ""
-                }`}
+                className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${!selectedSubject ? "bg-gray-100 cursor-not-allowed" : ""
+                  }`}
               >
                 <option value="">Select Exam</option>
                 {exams?.map((exam) => (
@@ -375,7 +405,7 @@ const AddMarks = () => {
             </div>
           </div>
 
-          <div className="mt-6 flex justify-center w-[10%] mx-auto">
+          <div className="mt-6 flex justify-end">
             <CustomButton
               type="submit"
               disabled={
@@ -396,9 +426,9 @@ const AddMarks = () => {
 
       {/* Marks Entry Section */}
       {!showSearch && masterMarksData && masterMarksData.length > 0 && (
-        <div className="w-full bg-white rounded-lg p-6">
+        <div className="w-full mt-8">
           <div className="space-y-4 w-full mb-6">
-            <div className="flex flex-col gap-4 w-[90%] mx-auto">
+            <div className="flex flex-col gap-4">
               <div className="grid grid-cols-4 gap-4">
                 <div className="border p-3 rounded-md shadow">
                   <span className="text-sm text-gray-500">
@@ -470,34 +500,11 @@ const AddMarks = () => {
             </CustomButton>
           </div>
 
-          <div className="grid grid-cols-4 gap-4 w-[100%] mx-auto">
-            {masterMarksData.map((student) => (
-              <div
-                key={student._id}
-                className="flex items-center justify-between w-full border rounded-md"
-              >
-                <p className="font-medium text-gray-700 flex items-center justify-center px-3 h-full py-2 rounded-md min-w-[120px] text-center">
-                  {student.enrollmentNo}
-                </p>
-                <input
-                  type="number"
-                  min={0}
-                  max={selectedExam?.totalMarks || 100}
-                  className="px-4 py-2 border rounded-md focus:outline-none bg-gray-50 border-gray-200 focus:ring-2 focus:ring-blue-500 w-full m-2"
-                  value={marksData[student._id] || ""}
-                  placeholder="Enter Marks"
-                  onChange={(e) =>
-                    setMarksData({
-                      ...marksData,
-                      [student._id]: e.target.value,
-                    })
-                  }
-                />
-              </div>
-            ))}
+          <div className="w-full overflow-x-auto">
+            <DataTable data={masterMarksData} columns={marksColumns} pageSize={10} />
           </div>
 
-          <div className="flex flex-col items-center gap-4 bottom-0 left-0 right-0 bg-white p-4 border-t mt-10">
+          <div className="flex justify-between items-center mt-6 p-4 bg-gray-50 border rounded-lg">
             <div className="flex items-center gap-2">
               <input
                 type="checkbox"

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { MdOutlineDelete, MdEdit } from "react-icons/md";
 import { IoMdAdd, IoMdClose } from "react-icons/io";
@@ -7,6 +7,8 @@ import Heading from "../../components/Heading";
 import DeleteConfirm from "../../components/DeleteConfirm";
 import CustomButton from "../../components/CustomButton";
 import Loading from "../../components/Loading";
+import NoData from "../../components/NoData";
+import DataTable from "../../components/DataTable";
 
 const Faculty = () => {
   const [data, setData] = useState({
@@ -38,6 +40,12 @@ const Faculty = () => {
   const [branch, setBranches] = useState([]);
 
   const [faculty, setFaculty] = useState([]);
+  const [searchParams, setSearchParams] = useState({
+    employeeId: "",
+    name: "",
+    designation: "",
+    branch: "",
+  });
   const [showAddForm, setShowAddForm] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [selectedFacultyId, setSelectedFacultyId] = useState(null);
@@ -45,6 +53,7 @@ const Faculty = () => {
   const userToken = localStorage.getItem("userToken");
   const [file, setFile] = useState(null);
   const [dataLoading, setDataLoading] = useState(null);
+  const [hasSearched, setHasSearched] = useState(false);
 
   useEffect(() => {
     getFacultyHandler();
@@ -100,6 +109,71 @@ const Faculty = () => {
     }
   };
 
+  const handleSearchInputChange = (e) => {
+    const { name, value } = e.target;
+    setSearchParams((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const searchFacultyHandler = async (e) => {
+    e.preventDefault();
+
+    if (
+      !searchParams.employeeId &&
+      !searchParams.name &&
+      !searchParams.designation &&
+      !searchParams.branch
+    ) {
+      toast.error("Please select at least one filter");
+      return;
+    }
+
+    setDataLoading(true);
+    setHasSearched(true);
+    toast.loading("Searching faculty...");
+    try {
+      const response = await axiosWrapper.post("/faculty/search", searchParams, {
+        headers: { Authorization: `Bearer ${userToken}` },
+      });
+
+      toast.dismiss();
+      if (response.data.success) {
+        setFaculty(response.data.data || []);
+      } else {
+        toast.error(response.data.message);
+      }
+    } catch (error) {
+      toast.dismiss();
+      if (error.response?.status === 404) {
+        setFaculty([]);
+      } else {
+        toast.error(error.response?.data?.message || "Error searching faculty");
+      }
+    } finally {
+      setDataLoading(false);
+    }
+  };
+
+  const refreshFacultyList = async () => {
+    const hasAnyFilter =
+      !!searchParams.employeeId ||
+      !!searchParams.name ||
+      !!searchParams.designation ||
+      !!searchParams.branch;
+
+    if (hasSearched && hasAnyFilter) {
+      try {
+        const response = await axiosWrapper.post("/faculty/search", searchParams, {
+          headers: { Authorization: `Bearer ${userToken}` },
+        });
+        setFaculty(response.data.data || []);
+      } catch (error) {
+        setFaculty([]);
+      }
+    } else {
+      await getFacultyHandler();
+    }
+  };
+
   const addFacultyHandler = async () => {
     try {
       toast.loading(isEditing ? "Updating Faculty" : "Adding Faculty");
@@ -151,7 +225,7 @@ const Faculty = () => {
           toast.success(response.data.message);
         }
         resetForm();
-        getFacultyHandler();
+        refreshFacultyList();
       } else {
         toast.error(response.data.message);
       }
@@ -214,7 +288,7 @@ const Faculty = () => {
       if (response.data.success) {
         toast.success("Faculty has been deleted successfully");
         setIsDeleteConfirmOpen(false);
-        getFacultyHandler();
+        refreshFacultyList();
       } else {
         toast.error(response.data.message);
       }
@@ -266,8 +340,64 @@ const Faculty = () => {
     });
   };
 
+  const resolveProfileImage = (profile) => {
+    if (!profile) return "https://via.placeholder.com/48?text=User";
+    if (/^https?:\/\//i.test(profile)) return profile;
+    const mediaBase = process.env.REACT_APP_MEDIA_LINK || "";
+    return `${mediaBase}/${profile}`.replace(/([^:]\/)\/+/g, "$1");
+  };
+
+  const facultyColumns = useMemo(
+    () => [
+      {
+        header: "Profile",
+        cell: ({ row }) => (
+          <img
+            src={resolveProfileImage(row.original.profile)}
+            alt={`${row.original.firstName || "Faculty"} profile`}
+            className="w-12 h-12 rounded-full object-cover"
+            onError={(e) => {
+              e.currentTarget.src = "https://via.placeholder.com/48?text=User";
+            }}
+          />
+        ),
+      },
+      {
+        header: "Name",
+        cell: ({ row }) =>
+          `${row.original.firstName || ""} ${row.original.lastName || ""}`,
+      },
+      { header: "Email", accessorKey: "email" },
+      { header: "Phone", accessorKey: "phone" },
+      { header: "Employee ID", accessorKey: "employeeId" },
+      { header: "Designation", accessorKey: "designation" },
+      {
+        header: "Actions",
+        cell: ({ row }) => (
+          <div className="flex justify-center gap-4">
+            <CustomButton
+              variant="secondary"
+              className="!p-2"
+              onClick={() => editFacultyHandler(row.original)}
+            >
+              <MdEdit />
+            </CustomButton>
+            <CustomButton
+              variant="danger"
+              className="!p-2"
+              onClick={() => deleteFacultyHandler(row.original._id)}
+            >
+              <MdOutlineDelete />
+            </CustomButton>
+          </div>
+        ),
+      },
+    ],
+    []
+  );
+
   return (
-    <div className="w-full mx-auto mt-10 flex justify-center items-start flex-col mb-10 relative">
+    <div className="w-full mx-auto flex justify-center items-start flex-col mb-10 relative">
       <div className="flex justify-between items-center w-full">
         <Heading title="Faculty Management" />
         <CustomButton
@@ -648,57 +778,80 @@ const Faculty = () => {
 
       {!dataLoading && !showAddForm && (
         <div className="mt-8 w-full">
-          <table className="text-sm min-w-full bg-white">
-            <thead>
-              <tr className="bg-green-500 text-white">
-                <th className="py-4 px-6 text-left font-semibold">Name</th>
-                <th className="py-4 px-6 text-left font-semibold">Email</th>
-                <th className="py-4 px-6 text-left font-semibold">Phone</th>
-                <th className="py-4 px-6 text-left font-semibold">
+          <form onSubmit={searchFacultyHandler} className="flex items-center mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-[90%] mx-auto">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
                   Employee ID
-                </th>
-                <th className="py-4 px-6 text-left font-semibold">
+                </label>
+                <input
+                  type="text"
+                  name="employeeId"
+                  value={searchParams.employeeId}
+                  onChange={handleSearchInputChange}
+                  className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter employee id"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Name
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  value={searchParams.name}
+                  onChange={handleSearchInputChange}
+                  className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter faculty name"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
                   Designation
-                </th>
-                <th className="py-4 px-6 text-center font-semibold">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {faculty && faculty.length > 0 ? (
-                faculty.map((item, index) => (
-                  <tr key={index} className="border-b hover:bg-blue-50">
-                    <td className="py-4 px-6">{`${item.firstName} ${item.lastName}`}</td>
-                    <td className="py-4 px-6">{item.email}</td>
-                    <td className="py-4 px-6">{item.phone}</td>
-                    <td className="py-4 px-6">{item.employeeId}</td>
-                    <td className="py-4 px-6">{item.designation}</td>
-                    <td className="py-4 px-6 text-center flex justify-center gap-4">
-                      <CustomButton
-                        variant="secondary"
-                        className="!p-2"
-                        onClick={() => editFacultyHandler(item)}
-                      >
-                        <MdEdit />
-                      </CustomButton>
-                      <CustomButton
-                        variant="danger"
-                        className="!p-2"
-                        onClick={() => deleteFacultyHandler(item._id)}
-                      >
-                        <MdOutlineDelete />
-                      </CustomButton>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="6" className="text-center text-base pt-10">
-                    No Faculty found.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                </label>
+                <input
+                  type="text"
+                  name="designation"
+                  value={searchParams.designation}
+                  onChange={handleSearchInputChange}
+                  className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter designation"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Branch
+                </label>
+                <select
+                  name="branch"
+                  value={searchParams.branch}
+                  onChange={handleSearchInputChange}
+                  className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Select Branch</option>
+                  {branch?.map((item) => (
+                    <option key={item._id} value={item._id}>
+                      {item.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div className="mt-6 flex justify-center w-[10%] mx-auto">
+              <CustomButton type="submit" disabled={dataLoading} variant="primary">
+                {dataLoading ? "Searching..." : "Search"}
+              </CustomButton>
+            </div>
+          </form>
+
+          {hasSearched && faculty.length === 0 && <NoData title="No faculty found" />}
+
+          {faculty && faculty.length > 0 && (
+            <div className="mt-8">
+              <DataTable data={faculty} columns={facultyColumns} pageSize={10} />
+            </div>
+          )}
         </div>
       )}
       <DeleteConfirm

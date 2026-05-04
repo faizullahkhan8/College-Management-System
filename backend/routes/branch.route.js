@@ -6,9 +6,11 @@ const {
   addBranchController,
   updateBranchController,
   deleteBranchController,
+  searchBranchController,
 } = require("../controllers/branch.controller");
 
 router.get("/", auth, getBranchController);
+router.post("/search", auth, searchBranchController);
 router.post("/", auth, addBranchController);
 router.patch("/:id", auth, updateBranchController);
 router.delete("/:id", auth, deleteBranchController);

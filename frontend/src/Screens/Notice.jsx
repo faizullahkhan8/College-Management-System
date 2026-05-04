@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { IoMdLink, IoMdAdd, IoMdClose } from "react-icons/io";
-import { HiOutlineCalendar } from "react-icons/hi";
+import React, { useEffect, useMemo, useState } from "react";
+import { IoMdAdd, IoMdClose } from "react-icons/io";
 import { useLocation, useNavigate } from "react-router-dom";
 import { MdDeleteOutline, MdEditNote } from "react-icons/md";
 import toast from "react-hot-toast";
@@ -9,6 +8,7 @@ import axiosWrapper from "../utils/AxiosWrapper";
 import CustomButton from "../components/CustomButton";
 import DeleteConfirm from "../components/DeleteConfirm";
 import Loading from "../components/Loading";
+import DataTable from "../components/DataTable";
 
 const Notice = () => {
   const router = useLocation();
@@ -20,6 +20,7 @@ const Notice = () => {
   const [selectedNoticeId, setSelectedNoticeId] = useState(null);
   const [dataLoading, setDataLoading] = useState(false);
   const token = localStorage.getItem("userToken");
+  const [filters, setFilters] = useState({ title: "", type: "" });
 
   const [formData, setFormData] = useState({
     title: "",
@@ -62,6 +63,87 @@ const Notice = () => {
   useEffect(() => {
     getNotices();
   }, [router.pathname]);
+
+  const filteredNotices = useMemo(() => {
+    return (notices || []).filter((notice) => {
+      const byTitle = filters.title
+        ? notice.title?.toLowerCase().includes(filters.title.toLowerCase())
+        : true;
+      const byType = filters.type ? notice.type === filters.type : true;
+      return byTitle && byType;
+    });
+  }, [notices, filters]);
+
+  const noticeColumns = useMemo(
+    () => [
+      { header: "Title", accessorKey: "title" },
+      { header: "Description", accessorKey: "description" },
+      {
+        header: "Type",
+        cell: ({ row }) => (
+          <span className="capitalize">
+            {row.original.type === "both" ? "Both" : row.original.type}
+          </span>
+        ),
+      },
+      {
+        header: "Date",
+        cell: ({ row }) =>
+          new Date(row.original.createdAt).toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          }),
+      },
+      {
+        header: "Link",
+        cell: ({ row }) =>
+          row.original.link ? (
+            <a
+              href={row.original.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline"
+            >
+              Open
+            </a>
+          ) : (
+            "-"
+          ),
+      },
+      ...((router.pathname === "/faculty" || router.pathname === "/admin")
+        ? [
+          {
+            header: "Actions",
+            cell: ({ row }) => (
+              <div className="flex gap-2">
+                <CustomButton
+                  onClick={() => {
+                    setSelectedNoticeId(row.original._id);
+                    setIsDeleteConfirmOpen(true);
+                  }}
+                  variant="danger"
+                  className="!p-1.5 rounded-full"
+                  title="Delete Notice"
+                >
+                  <MdDeleteOutline size={18} />
+                </CustomButton>
+                <CustomButton
+                  onClick={() => handleEdit(row.original)}
+                  variant="secondary"
+                  className="!p-1.5 rounded-full"
+                  title="Edit Notice"
+                >
+                  <MdEditNote size={18} />
+                </CustomButton>
+              </div>
+            ),
+          },
+        ]
+        : []),
+    ],
+    [router.pathname]
+  );
 
   const openAddModal = () => {
     setEditingNotice(null);
@@ -146,7 +228,7 @@ const Notice = () => {
   };
 
   return (
-    <div className="w-full mx-auto flex justify-center items-start flex-col my-10">
+    <div className="w-full mx-auto flex justify-center items-start flex-col">
       <div className="relative flex justify-between items-center w-full">
         <Heading title="Notices" />
         {!dataLoading &&
@@ -160,84 +242,54 @@ const Notice = () => {
       {dataLoading && <Loading />}
 
       {!dataLoading && (
-        <div className="mt-8">
-          {notices.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              No notices found
-            </div>
-          ) : (
-            <div className="mt-8 w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {notices?.map((notice) => (
-                <div
-                  key={notice._id}
-                  className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border border-gray-100 w-[350px]"
+        <>
+          {/* Filters */}
+          <div className="w-full mt-8">
+            <div className="grid grid-cols-4 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Filter by Title
+                </label>
+                <input
+                  type="text"
+                  value={filters.title}
+                  onChange={(e) =>
+                    setFilters((prev) => ({ ...prev, title: e.target.value }))
+                  }
+                  placeholder="Search title..."
+                  className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Filter by Type
+                </label>
+                <select
+                  value={filters.type}
+                  onChange={(e) =>
+                    setFilters((prev) => ({ ...prev, type: e.target.value }))
+                  }
+                  className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  <div className="p-6">
-                    <div className="flex justify-between items-start mb-4">
-                      <h3
-                        className={`text-lg font-semibold line-clamp-2 group flex items-start ${
-                          notice.link
-                            ? "cursor-pointer hover:text-blue-600"
-                            : ""
-                        }`}
-                        onClick={() => notice.link && window.open(notice.link)}
-                      >
-                        {notice.title}
-                        {notice.link && (
-                          <IoMdLink className="ml-2 flex-shrink-0 text-xl opacity-70 group-hover:opacity-100 group-hover:text-blue-500" />
-                        )}
-                      </h3>
-                      {(router.pathname === "/faculty" ||
-                        router.pathname === "/admin") && (
-                        <div className="flex gap-2 ml-2 flex-shrink-0">
-                          <CustomButton
-                            onClick={() => {
-                              setSelectedNoticeId(notice._id);
-                              setIsDeleteConfirmOpen(true);
-                            }}
-                            variant="danger"
-                            className="!p-1.5 rounded-full"
-                            title="Delete Notice"
-                          >
-                            <MdDeleteOutline size={18} />
-                          </CustomButton>
-                          <CustomButton
-                            onClick={() => handleEdit(notice)}
-                            variant="secondary"
-                            className="!p-1.5 rounded-full"
-                            title="Edit Notice"
-                          >
-                            <MdEditNote size={18} />
-                          </CustomButton>
-                        </div>
-                      )}
-                    </div>
-
-                    <p className="text-gray-600 text-sm line-clamp-3 mb-4">
-                      {notice.description}
-                    </p>
-
-                    <div className="flex items-center justify-between text-xs text-gray-500">
-                      <div className="flex items-center">
-                        <HiOutlineCalendar className="mr-1" />
-                        {new Date(notice.createdAt).toLocaleString("en-GB", {
-                          day: "2-digit",
-                          month: "2-digit",
-                          year: "numeric",
-                        })}
-                      </div>
-                      {notice.type !== "both" && (
-                        <span className="bg-blue-50 text-blue-600 px-3 py-1 rounded-full font-medium">
-                          {notice.type === "student" ? "Student" : "Faculty"}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
+                  <option value="">All Types</option>
+                  <option value="student">Student</option>
+                  <option value="faculty">Faculty</option>
+                  <option value="both">Both</option>
+                </select>
+              </div>
             </div>
-          )}
-        </div>
+          </div>
+
+          <div className="w-full mt-8 overflow-x-auto">
+            {filteredNotices.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                No notices found
+              </div>
+            ) : (
+              <DataTable data={filteredNotices} columns={noticeColumns} pageSize={10} />
+            )}
+          </div>
+        </>
       )}
 
       {/* Modal UI */}

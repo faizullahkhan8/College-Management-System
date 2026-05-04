@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { toast } from "react-hot-toast";
 import { MdOutlineDelete, MdEdit } from "react-icons/md";
 import { IoMdAdd } from "react-icons/io";
@@ -10,6 +10,7 @@ import CustomButton from "../components/CustomButton";
 import { FiUpload } from "react-icons/fi";
 import { useSelector } from "react-redux";
 import Loading from "../components/Loading";
+import DataTable from "../components/DataTable";
 
 const Exam = () => {
   const [data, setData] = useState({
@@ -30,6 +31,7 @@ const Exam = () => {
   const loginType = localStorage.getItem("userType");
   const [processLoading, setProcessLoading] = useState(false);
   const [dataLoading, setDataLoading] = useState(false);
+  const [filters, setFilters] = useState({ semester: "", examType: "" });
 
   useEffect(() => {
     getExamsHandler();
@@ -183,8 +185,64 @@ const Exam = () => {
     }
   };
 
+  const filteredExams = useMemo(() => {
+    if (!exams) return [];
+    return exams.filter((item) => {
+      const bySemester = filters.semester
+        ? String(item.semester) === String(filters.semester)
+        : true;
+      const byExamType = filters.examType
+        ? item.examType === filters.examType
+        : true;
+      return bySemester && byExamType;
+    });
+  }, [exams, filters]);
+
+  const examColumns = useMemo(
+    () => [
+      { header: "Exam Name", accessorKey: "name" },
+      {
+        header: "Date",
+        cell: ({ row }) => new Date(row.original.date).toLocaleDateString(),
+      },
+      { header: "Semester", accessorKey: "semester" },
+      {
+        header: "Exam Type",
+        cell: ({ row }) =>
+          row.original.examType === "mid" ? "Mid Term" : "End Term",
+      },
+      { header: "Total Marks", accessorKey: "totalMarks" },
+      ...(loginType !== "Student"
+        ? [
+          {
+            header: "Actions",
+            cell: ({ row }) => (
+              <div className="flex justify-center gap-4">
+                <CustomButton
+                  variant="secondary"
+                  className="!p-2"
+                  onClick={() => editExamHandler(row.original)}
+                >
+                  <MdEdit />
+                </CustomButton>
+                <CustomButton
+                  variant="danger"
+                  className="!p-2"
+                  onClick={() => deleteExamHandler(row.original._id)}
+                >
+                  <MdOutlineDelete />
+                </CustomButton>
+              </div>
+            ),
+          },
+        ]
+        : []),
+    ],
+    [loginType]
+  );
+
   return (
-    <div className="w-full mx-auto mt-10 flex justify-center items-start flex-col mb-10">
+    <div className="w-full mx-auto flex justify-center items-start flex-col mb-10">
       <div className="flex justify-between items-center w-full">
         <Heading title="Exam Details" />
         {!dataLoading && loginType !== "Student" && (
@@ -196,65 +254,35 @@ const Exam = () => {
 
       {!dataLoading ? (
         <div className="mt-8 w-full">
-          <table className="text-sm min-w-full bg-white">
-            <thead>
-              <tr className="bg-green-500 text-white">
-                <th className="py-4 px-6 text-left font-semibold">Exam Name</th>
-                <th className="py-4 px-6 text-left font-semibold">Date</th>
-                <th className="py-4 px-6 text-left font-semibold">Semester</th>
-                <th className="py-4 px-6 text-left font-semibold">Exam Type</th>
-                <th className="py-4 px-6 text-left font-semibold">
-                  Total Marks
-                </th>
-                {loginType !== "Student" && (
-                  <th className="py-4 px-6 text-center font-semibold">
-                    Actions
-                  </th>
-                )}
-              </tr>
-            </thead>
-            <tbody>
-              {exams && exams.length > 0 ? (
-                exams.map((item, index) => (
-                  <tr key={index} className="border-b hover:bg-blue-50">
-                    <td className="py-4 px-6">{item.name}</td>
-                    <td className="py-4 px-6">
-                      {new Date(item.date).toLocaleDateString()}
-                    </td>
-                    <td className="py-4 px-6">{item.semester}</td>
-                    <td className="py-4 px-6">
-                      {item.examType === "mid" ? "Mid Term" : "End Term"}
-                    </td>
-                    <td className="py-4 px-6">{item.totalMarks}</td>
-                    {loginType !== "Student" && (
-                      <td className="py-4 px-6 text-center flex justify-center gap-4">
-                        <CustomButton
-                          variant="secondary"
-                          className="!p-2"
-                          onClick={() => editExamHandler(item)}
-                        >
-                          <MdEdit />
-                        </CustomButton>
-                        <CustomButton
-                          variant="danger"
-                          className="!p-2"
-                          onClick={() => deleteExamHandler(item._id)}
-                        >
-                          <MdOutlineDelete />
-                        </CustomButton>
-                      </td>
-                    )}
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="5x" className="text-center text-base pt-10">
-                    No Exams found.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <select
+              value={filters.semester}
+              onChange={(e) =>
+                setFilters((prev) => ({ ...prev, semester: e.target.value }))
+              }
+              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">All Semesters</option>
+              {[1, 2, 3, 4, 5, 6, 7, 8].map((sem) => (
+                <option key={sem} value={sem}>
+                  Semester {sem}
+                </option>
+              ))}
+            </select>
+            <select
+              value={filters.examType}
+              onChange={(e) =>
+                setFilters((prev) => ({ ...prev, examType: e.target.value }))
+              }
+              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">All Exam Types</option>
+              <option value="mid">Mid Term</option>
+              <option value="end">End Term</option>
+            </select>
+          </div>
+
+          <DataTable data={filteredExams} columns={examColumns} pageSize={10} />
         </div>
       ) : (
         <Loading />

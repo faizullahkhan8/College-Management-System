@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { FiUpload, FiEdit2, FiTrash2 } from "react-icons/fi";
 import Heading from "../../components/Heading";
 import { AiOutlineClose } from "react-icons/ai";
@@ -9,6 +9,7 @@ import DeleteConfirm from "../../components/DeleteConfirm";
 import CustomButton from "../../components/CustomButton";
 import { MdLink } from "react-icons/md";
 import { IoMdAdd } from "react-icons/io";
+import DataTable from "../../components/DataTable";
 const Material = () => {
   const [materials, setMaterials] = useState([]);
   const [subjects, setSubjects] = useState([]);
@@ -229,8 +230,49 @@ const Material = () => {
     }
   };
 
+  const materialColumns = useMemo(
+    () => [
+      {
+        header: "File",
+        cell: ({ row }) => (
+          <CustomButton
+            variant="primary"
+            onClick={() => window.open(`${row.original.file}`)}
+          >
+            <MdLink className="text-xl" />
+          </CustomButton>
+        ),
+      },
+      { header: "Title", accessorKey: "title" },
+      { header: "Subject", cell: ({ row }) => row.original.subject?.name || "-" },
+      { header: "Semester", accessorKey: "semester" },
+      { header: "Branch", cell: ({ row }) => row.original.branch?.name || "-" },
+      { header: "Type", cell: ({ row }) => <span className="capitalize">{row.original.type}</span> },
+      {
+        header: "Actions",
+        cell: ({ row }) => (
+          <div className="flex gap-4">
+            <CustomButton variant="secondary" onClick={() => handleEdit(row.original)}>
+              <FiEdit2 />
+            </CustomButton>
+            <CustomButton
+              variant="danger"
+              onClick={() => {
+                setSelectedMaterialId(row.original._id);
+                setIsDeleteConfirmOpen(true);
+              }}
+            >
+              <FiTrash2 />
+            </CustomButton>
+          </div>
+        ),
+      },
+    ],
+    []
+  );
+
   return (
-    <div className="w-full mx-auto mt-10 flex justify-center items-start flex-col mb-10">
+    <div className="w-full mx-auto flex justify-center items-start flex-col mb-10">
       <div className="flex justify-between items-center w-full">
         <Heading title="Material Management" />
         <CustomButton onClick={() => setShowModal(true)}>
@@ -325,61 +367,7 @@ const Material = () => {
             No materials found
           </div>
         ) : (
-          <table className="text-sm min-w-full bg-white">
-            <thead>
-              <tr className="bg-green-500 text-white">
-                <th className="py-4 px-6 text-left font-semibold">File</th>
-                <th className="py-4 px-6 text-left font-semibold">Title</th>
-                <th className="py-4 px-6 text-left font-semibold">Subject</th>
-                <th className="py-4 px-6 text-left font-semibold">Semester</th>
-                <th className="py-4 px-6 text-left font-semibold">Branch</th>
-                <th className="py-4 px-6 text-left font-semibold">Type</th>
-                <th className="py-4 px-6 text-left font-semibold">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {materials.map((material) => (
-                <tr key={material._id} className="border-b hover:bg-blue-50">
-                  <td className="py-4 px-6">
-                    <CustomButton
-                      variant="primary"
-                      onClick={() => {
-                        window.open(
-                          `${material.file}`
-                        );
-                      }}
-                    >
-                      <MdLink className="text-xl" />
-                    </CustomButton>
-                  </td>
-                  <td className="py-4 px-6">{material.title}</td>
-                  <td className="py-4 px-6">{material.subject.name}</td>
-                  <td className="py-4 px-6">{material.semester}</td>
-                  <td className="py-4 px-6">{material.branch.name}</td>
-                  <td className="py-4 px-6 capitalize">{material.type}</td>
-                  <td className="py-4 px-6">
-                    <div className="flex gap-4">
-                      <CustomButton
-                        variant="secondary"
-                        onClick={() => handleEdit(material)}
-                      >
-                        <FiEdit2 />
-                      </CustomButton>
-                      <CustomButton
-                        variant="danger"
-                        onClick={() => {
-                          setSelectedMaterialId(material._id);
-                          setIsDeleteConfirmOpen(true);
-                        }}
-                      >
-                        <FiTrash2 />
-                      </CustomButton>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <DataTable data={materials} columns={materialColumns} pageSize={10} />
         )}
       </div>
 
@@ -540,8 +528,8 @@ const Material = () => {
                   {dataLoading
                     ? "Processing..."
                     : editingMaterial
-                    ? "Update Material"
-                    : "Add Material"}
+                      ? "Update Material"
+                      : "Add Material"}
                 </CustomButton>
               </div>
             </form>

@@ -328,6 +328,50 @@ const updateLoggedInPasswordController = async (req, res) => {
   }
 };
 
+const searchFacultyController = async (req, res) => {
+  try {
+    const { employeeId, name, designation, branch } = req.body;
+    const query = {};
+
+    if (!employeeId && !name && !designation && !branch) {
+      return ApiResponse.badRequest("Select at least one filter").send(res);
+    }
+
+    if (employeeId) {
+      query.employeeId = employeeId;
+    }
+
+    if (designation) {
+      query.designation = { $regex: designation, $options: "i" };
+    }
+
+    if (branch) {
+      query.branchId = branch;
+    }
+
+    if (name) {
+      query.$or = [
+        { firstName: { $regex: name, $options: "i" } },
+        { lastName: { $regex: name, $options: "i" } },
+      ];
+    }
+
+    const faculty = await facultyDetails
+      .find(query)
+      .select("-password -__v")
+      .sort({ employeeId: 1 });
+
+    if (!faculty || faculty.length === 0) {
+      return ApiResponse.notFound("No faculty found").send(res);
+    }
+
+    return ApiResponse.success(faculty, "Faculty found successfully").send(res);
+  } catch (error) {
+    console.error("Search Faculty Error: ", error);
+    return ApiResponse.internalServerError().send(res);
+  }
+};
+
 module.exports = {
   loginFacultyController,
   registerFacultyController,
@@ -338,4 +382,5 @@ module.exports = {
   sendFacultyResetPasswordEmail,
   updateFacultyPasswordHandler,
   updateLoggedInPasswordController,
+  searchFacultyController,
 };

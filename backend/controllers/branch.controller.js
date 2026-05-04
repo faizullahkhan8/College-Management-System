@@ -92,9 +92,35 @@ const deleteBranchController = async (req, res, next) => {
   }
 };
 
+const searchBranchController = async (req, res) => {
+  try {
+    const { name, branchId } = req.body;
+
+    if (!name && !branchId) {
+      return ApiResponse.error("Select at least one filter", 400).send(res);
+    }
+
+    const query = {};
+    if (name) query.name = { $regex: name, $options: "i" };
+    if (branchId) query.branchId = { $regex: branchId, $options: "i" };
+
+    const branches = await Branch.find(query);
+    if (!branches || branches.length === 0) {
+      return ApiResponse.error("No branches found", 404).send(res);
+    }
+
+    return ApiResponse.success(branches, "Branches found successfully").send(
+      res
+    );
+  } catch (error) {
+    return ApiResponse.error(error.message).send(res);
+  }
+};
+
 module.exports = {
   getBranchController,
   addBranchController,
   updateBranchController,
   deleteBranchController,
+  searchBranchController,
 };

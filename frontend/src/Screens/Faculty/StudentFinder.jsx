@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import Heading from "../../components/Heading";
 import axiosWrapper from "../../utils/AxiosWrapper";
 import CustomButton from "../../components/CustomButton";
 import NoData from "../../components/NoData";
+import DataTable from "../../components/DataTable";
 
 const StudentFinder = () => {
   const [searchParams, setSearchParams] = useState({
@@ -98,8 +99,43 @@ const StudentFinder = () => {
     setShowModal(true);
   };
 
+  const resolveProfileImage = (profile) => {
+    if (!profile) return "https://via.placeholder.com/48?text=User";
+    if (/^https?:\/\//i.test(profile)) return profile;
+    const base = process.env.REACT_APP_MEDIA_LINK || "";
+    return `${base}/${profile}`.replace(/([^:]\/)\/+/g, "$1");
+  };
+
+  const columns = useMemo(
+    () => [
+      {
+        header: "Profile",
+        cell: ({ row }) => (
+          <img
+            src={resolveProfileImage(row.original.profile)}
+            alt={`${row.original.firstName}'s profile`}
+            className="w-12 h-12 object-cover rounded-full"
+            onError={(e) => {
+              e.currentTarget.src = "https://via.placeholder.com/48?text=User";
+            }}
+          />
+        ),
+      },
+      {
+        header: "Name",
+        cell: ({ row }) =>
+          `${row.original.firstName} ${row.original.middleName || ""} ${row.original.lastName}`,
+      },
+      { header: "Enrollment No", accessorKey: "enrollmentNo" },
+      { header: "Semester", accessorKey: "semester" },
+      { header: "Branch", cell: ({ row }) => row.original.branchId?.name || "-" },
+      { header: "Email", accessorKey: "email" },
+    ],
+    []
+  );
+
   return (
-    <div className="w-full mx-auto mt-10 flex justify-center items-start flex-col mb-10">
+    <div className="w-full mx-auto flex justify-center items-start flex-col mb-10">
       <div className="flex justify-between items-center w-full">
         <Heading title="Student Finder" />
       </div>
@@ -203,54 +239,9 @@ const StudentFinder = () => {
         {students.length > 0 && (
           <div className="mt-8">
             <h2 className="text-xl font-semibold mb-4">Search Results</h2>
-            <div className="overflow-x-auto">
-              <table className="min-w-full bg-white border border-gray-300">
-                <thead>
-                  <tr className="bg-gray-100">
-                    <th className="px-6 py-3 border-b text-left">Profile</th>
-                    <th className="px-6 py-3 border-b text-left">Name</th>
-                    <th className="px-6 py-3 border-b text-left">
-                      Enrollment No
-                    </th>
-                    <th className="px-6 py-3 border-b text-left">Semester</th>
-                    <th className="px-6 py-3 border-b text-left">Branch</th>
-                    <th className="px-6 py-3 border-b text-left">Email</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {students.map((student) => (
-                    <tr
-                      key={student._id}
-                      className="hover:bg-gray-50 cursor-pointer"
-                      onClick={() => handleRowClick(student)}
-                    >
-                      <td className="px-6 py-4 border-b">
-                        <img
-                          src={`${process.env.REACT_APP_MEDIA_LINK}/${student.profile}`}
-                          alt={`${student.firstName}'s profile`}
-                          className="w-12 h-12 object-cover rounded-full"
-                          onError={(e) => {
-                            e.target.src =
-                              "https://images.unsplash.com/photo-1744315900478-fa44dc6a4e89?q=80&w=3087&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
-                          }}
-                        />
-                      </td>
-                      <td className="px-6 py-4 border-b">
-                        {student.firstName} {student.middleName}{" "}
-                        {student.lastName}
-                      </td>
-                      <td className="px-6 py-4 border-b">
-                        {student.enrollmentNo}
-                      </td>
-                      <td className="px-6 py-4 border-b">{student.semester}</td>
-                      <td className="px-6 py-4 border-b">
-                        {student.branchId?.name}
-                      </td>
-                      <td className="px-6 py-4 border-b">{student.email}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <DataTable data={students} columns={columns} pageSize={10} />
+            <div className="mt-3 text-xs text-gray-500">
+              Click any row to view complete student details.
             </div>
           </div>
         )}
