@@ -25,160 +25,149 @@ const FacultyLayout = ({ children }) => {
     const logout = () => {
         localStorage.removeItem("userToken");
         localStorage.removeItem("userType");
-        navigate("/");
+        navigate("/login");
     };
 
     const menuItems = useMemo(
         () => [
             { label: "Dashboard", icon: <FiHome />, to: "/faculty" },
-            {
-                label: "Timetable",
-                icon: <FiCalendar />,
-                to: "/faculty/timetable",
-            },
-            {
-                label: "Material",
-                icon: <FiFileText />,
-                to: "/faculty/material",
-            },
+            { label: "Timetable", icon: <FiCalendar />, to: "/faculty/timetable" },
+            { label: "Material", icon: <FiFileText />, to: "/faculty/material" },
             { label: "Notice", icon: <FiBell />, to: "/faculty/notice" },
             {
                 label: "Student Info",
                 icon: <FiSearch />,
                 to: "/faculty/student-info",
             },
-            {
-                label: "Attendance",
-                icon: <FiCheckSquare />,
-                to: "/faculty/attendance",
-            },
+            { label: "Attendance", icon: <FiCheckSquare />, to: "/faculty/attendance" },
             { label: "Marks", icon: <FiEdit3 />, to: "/faculty/marks" },
             { label: "Exam", icon: <FiClipboard />, to: "/faculty/exam" },
             { label: "Profile", icon: <FiUser />, to: "/faculty/profile" },
         ],
-        [],
+        []
     );
 
     const isActive = (path) => location.pathname === path;
 
     return (
-        <div className="h-screen overflow-hidden bg-slate-100">
-            <div className="lg:hidden sticky top-0 z-30 bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between">
-                <span className="font-semibold text-slate-800">
-                    Faculty Panel
-                </span>
-                <button
-                    onClick={() => setMobileOpen((prev) => !prev)}
-                    className="p-2 rounded-lg border border-slate-300 text-slate-700"
-                >
-                    {mobileOpen ? <FiX /> : <FiMenu />}
-                </button>
-            </div>
-
+        <div className="h-screen flex bg-gray-50 overflow-hidden">
+            {/* Mobile Sidebar Overlay */}
             {mobileOpen && (
                 <div
-                    className="fixed inset-0 bg-black/40 z-40 lg:hidden"
+                    className="fixed inset-0 bg-black/50 z-40 lg:hidden"
                     onClick={() => setMobileOpen(false)}
                 />
             )}
 
-            <div className="flex h-[calc(100vh-57px)] lg:h-screen">
-                <div
-                    className={`fixed lg:static z-50 h-full transition-transform duration-300 ${
-                        mobileOpen
-                            ? "translate-x-0"
-                            : "-translate-x-full lg:translate-x-0"
-                    }`}
+            {/* Mobile Sidebar */}
+            <div
+                className={`fixed inset-y-0 left-0 z-50 lg:hidden transition-transform duration-300 ${
+                    mobileOpen ? "translate-x-0" : "-translate-x-full"
+                }`}
+            >
+                <Sidebar width="260px" className="h-screen bg-white shadow-xl">
+                    <div className="flex items-center justify-between p-4 border-b h-16">
+                        <h1 className="text-xl font-bold text-green-600">
+                            Faculty Portal
+                        </h1>
+                        <button
+                            onClick={() => setMobileOpen(false)}
+                            className="p-2 hover:bg-gray-100 rounded-lg"
+                        >
+                            <FiX className="w-5 h-5" />
+                        </button>
+                    </div>
+                    <Menu className="mt-4">
+                        {menuItems.map((item) => (
+                            <MenuItem
+                                key={item.to}
+                                icon={item.icon}
+                                component={<Link to={item.to} />}
+                                onClick={() => setMobileOpen(false)}
+                                className={
+                                    isActive(item.to)
+                                        ? "bg-green-50 text-green-600"
+                                        : "text-gray-600 hover:bg-gray-50"
+                                }
+                            >
+                                {item.label}
+                            </MenuItem>
+                        ))}
+                        <MenuItem
+                            icon={<FiLogOut />}
+                            onClick={logout}
+                            className="text-red-600 hover:bg-red-50 mt-4"
+                        >
+                            Logout
+                        </MenuItem>
+                    </Menu>
+                </Sidebar>
+            </div>
+
+            {/* Desktop Sidebar - Fixed Full Height */}
+            <div className="hidden lg:block h-screen flex-shrink-0">
+                <Sidebar
+                    collapsed={collapsed}
+                    width="260px"
+                    collapsedWidth="80px"
+                    className="h-screen bg-white shadow-lg"
                 >
-                    <Sidebar
-                        collapsed={collapsed}
-                        backgroundColor="#f0fdf4"
-                        width="280px"
-                        collapsedWidth="88px"
-                        rootStyles={{
-                            borderRight: "1px solid #bbf7d0",
-                            height: "100vh",
-                            position: "sticky",
-                            top: 0,
-                        }}
+                    <div className="flex items-center justify-between p-4 border-b h-16">
+                        {!collapsed && (
+                            <h1 className="text-xl font-bold text-green-600 truncate">
+                                Faculty Portal
+                            </h1>
+                        )}
+                        <button
+                            onClick={() => setCollapsed(!collapsed)}
+                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                        >
+                            <FiMenu className="w-5 h-5 text-gray-600" />
+                        </button>
+                    </div>
+                    <Menu className="mt-4">
+                        {menuItems.map((item) => (
+                            <MenuItem
+                                key={item.to}
+                                icon={item.icon}
+                                component={<Link to={item.to} />}
+                                className={
+                                    isActive(item.to)
+                                        ? "bg-green-50 text-green-600"
+                                        : "text-gray-600 hover:bg-gray-50"
+                                }
+                            >
+                                {item.label}
+                            </MenuItem>
+                        ))}
+                        <MenuItem
+                            icon={<FiLogOut />}
+                            onClick={logout}
+                            className="text-red-600 hover:bg-red-50 mt-4"
+                        >
+                            Logout
+                        </MenuItem>
+                    </Menu>
+                </Sidebar>
+            </div>
+
+            {/* Main Content - Scrollable */}
+            <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
+                {/* Mobile Header */}
+                <div className="lg:hidden bg-white shadow-sm p-4 flex items-center justify-between flex-shrink-0 z-30">
+                    <h1 className="text-lg font-bold text-green-600">
+                        Faculty Portal
+                    </h1>
+                    <button
+                        onClick={() => setMobileOpen(true)}
+                        className="p-2 hover:bg-gray-100 rounded-lg"
                     >
-                        <div className="px-4 py-5 border-b border-green-200 flex items-center justify-between">
-                            {!collapsed && (
-                                <div>
-                                    <h2 className="text-green-900 font-semibold text-lg">
-                                        Faculty Workspace
-                                    </h2>
-                                </div>
-                            )}
-                            <button
-                                onClick={() => setCollapsed((prev) => !prev)}
-                                className="text-green-700 hover:text-green-900 p-2 rounded-md hover:bg-green-100"
-                            >
-                                <FiMenu />
-                            </button>
-                        </div>
-
-                        <div className="px-3 py-4">
-                            <Menu
-                                menuItemStyles={{
-                                    button: ({ active }) => ({
-                                        marginBottom: "8px",
-                                        borderRadius: "12px",
-                                        color: active ? "#ffffff" : "#166534",
-                                        background: active
-                                            ? "linear-gradient(90deg, #22c55e 0%, #16a34a 100%)"
-                                            : "transparent",
-                                        fontWeight: active ? 600 : 500,
-                                        padding: "12px 14px",
-                                    }),
-                                    icon: ({ active }) => ({
-                                        color: active ? "#ffffff" : "#16a34a",
-                                    }),
-                                }}
-                            >
-                                {menuItems.map((item) => (
-                                    <MenuItem
-                                        key={item.to}
-                                        icon={item.icon}
-                                        component={
-                                            <Link
-                                                to={item.to}
-                                                onClick={() =>
-                                                    setMobileOpen(false)
-                                                }
-                                            />
-                                        }
-                                        active={isActive(item.to)}
-                                    >
-                                        {item.label}
-                                    </MenuItem>
-                                ))}
-                            </Menu>
-                        </div>
-
-                        <div className="mt-auto px-3 py-4 border-t border-green-200">
-                            <Menu
-                                menuItemStyles={{
-                                    button: {
-                                        borderRadius: "12px",
-                                        color: "#b91c1c",
-                                        backgroundColor: "#fef2f2",
-                                        padding: "12px 14px",
-                                        fontWeight: 600,
-                                    },
-                                }}
-                            >
-                                <MenuItem icon={<FiLogOut />} onClick={logout}>
-                                    Logout
-                                </MenuItem>
-                            </Menu>
-                        </div>
-                    </Sidebar>
+                        <FiMenu className="w-6 h-6" />
+                    </button>
                 </div>
 
-                <main className="flex-1 h-full overflow-y-auto overflow-x-auto p-4 md:p-6 lg:p-8 w-full">
-                    {children}
-                </main>
+                {/* Page Content - Scrollable */}
+                <main className="flex-1 p-4 lg:p-8 overflow-y-auto">{children}</main>
             </div>
         </div>
     );

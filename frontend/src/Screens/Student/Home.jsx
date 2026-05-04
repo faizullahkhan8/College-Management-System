@@ -1,134 +1,152 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "../../components/Navbar";
-import { toast, Toaster } from "react-hot-toast";
-import Notice from "../Notice";
-import { useDispatch } from "react-redux";
+import { toast } from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
 import { setUserData } from "../../redux/actions";
 import axiosWrapper from "../../utils/AxiosWrapper";
-import Timetable from "./Timetable";
-import Material from "./Material";
-import Profile from "./Profile";
-import Exam from "../Exam";
-import ViewMarks from "./ViewMarks";
-import { useNavigate, useLocation } from "react-router-dom";
+import Heading from "../../components/Heading";
+import Loading from "../../components/Loading";
+import { Link } from "react-router-dom";
+import {
+    FiCalendar,
+    FiFileText,
+    FiBell,
+    FiClipboard,
+    FiAward,
+    FiUser,
+} from "react-icons/fi";
 
-const MENU_ITEMS = [
-  { id: "home", label: "Home", component: null },
-  { id: "timetable", label: "Timetable", component: Timetable },
-  { id: "material", label: "Material", component: Material },
-  { id: "notice", label: "Notice", component: Notice },
-  { id: "exam", label: "Exam", component: Exam },
-  { id: "marks", label: "Marks", component: ViewMarks },
+const menuCards = [
+    {
+        label: "Timetable",
+        icon: FiCalendar,
+        to: "/student/timetable",
+        color: "bg-blue-500",
+    },
+    {
+        label: "Material",
+        icon: FiFileText,
+        to: "/student/material",
+        color: "bg-green-500",
+    },
+    {
+        label: "Notice",
+        icon: FiBell,
+        to: "/student/notice",
+        color: "bg-yellow-500",
+    },
+    {
+        label: "Exam",
+        icon: FiClipboard,
+        to: "/student/exam",
+        color: "bg-purple-500",
+    },
+    {
+        label: "Marks",
+        icon: FiAward,
+        to: "/student/marks",
+        color: "bg-red-500",
+    },
+    {
+        label: "Profile",
+        icon: FiUser,
+        to: "/student/profile",
+        color: "bg-indigo-500",
+    },
 ];
 
 const Home = () => {
-  const [selectedMenu, setSelectedMenu] = useState("home");
-  const [profileData, setProfileData] = useState();
-  const [isLoading, setIsLoading] = useState(false);
-  const dispatch = useDispatch();
-  const userToken = localStorage.getItem("userToken");
-  const location = useLocation();
-  const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(false);
+    const dispatch = useDispatch();
+    const userToken = localStorage.getItem("userToken");
+    const userData = useSelector((state) => state.userData);
 
-  const fetchUserDetails = async () => {
-    console.log("API CALL STARTED"); // 👈 add this
-    setIsLoading(true);
-    const toastId = toast.loading("Loading user details...", {
-      duration: 1500
-    });
-    try {
-      const response = await axiosWrapper.get(`/student/my-details`, {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        },
-      });
-      if (response.data.success) {
-        console.log("API RESPONSE:", response);
-        setProfileData(response.data.data);
-        dispatch(setUserData(response.data.data));
-      } else {
-        toast.error(response.data.message);
-      }
-    } catch (error) {
-      console.error(error);
-      toast.error(
-        error.response?.data?.message || "Error fetching user details"
-      );
-    } finally {
-      setIsLoading(false);
-      toast.dismiss(toastId);
-    }
-  };
+    useEffect(() => {
+        const fetchUserDetails = async () => {
+            setIsLoading(true);
+            try {
+                const response = await axiosWrapper.get(`/student/my-details`, {
+                    headers: { Authorization: `Bearer ${userToken}` },
+                });
+                if (response.data.success) {
+                    dispatch(setUserData(response.data.data));
+                } else {
+                    toast.error(response.data.message);
+                }
+            } catch (error) {
+                toast.error(
+                    error.response?.data?.message ||
+                        "Error fetching user details",
+                );
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchUserDetails();
+    }, [dispatch, userToken]);
 
-  useEffect(() => {
-    fetchUserDetails();
-  }, [dispatch, userToken]);
-
-  const getMenuItemClass = (menuId) => {
-    const isSelected = selectedMenu.toLowerCase() === menuId.toLowerCase();
-    return `
-      text-center px-6 py-3 cursor-pointer
-      font-medium text-sm w-full
-      rounded-md
-      transition-all duration-300 ease-in-out
-      ${isSelected
-        ? "bg-gradient-to-r from-green-400 to-green-600 text-white shadow-lg transform -translate-y-1"
-        : "bg-green-100 text-green-700 hover:bg-blue-100"
-      }
-    `;
-  };
-
-  const renderContent = () => {
     if (isLoading) {
-      return (
-        <div className="flex justify-center items-center h-64">Loading...</div>
-      );
+        return (
+            <div className="flex justify-center items-center h-64">
+                <Loading />
+            </div>
+        );
     }
 
-    if (selectedMenu === "home" && profileData) {
-      return <Profile profileData={profileData} />;
-    }
+    return (
+        <div className="w-full mx-auto flex flex-col mb-10">
+            <Heading title="Student Dashboard" />
 
-    const MenuItem = MENU_ITEMS.find(
-      (item) => item.label.toLowerCase() === selectedMenu.toLowerCase()
-    )?.component;
+            {/* Welcome Section */}
+            {userData && (
+                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8">
+                    <div className="flex items-center gap-4">
+                        <img
+                            src={userData.profile}
+                            alt="Profile"
+                            className="w-16 h-16 rounded-full object-cover ring-2 ring-green-500"
+                        />
+                        <div>
+                            <h2 className="text-2xl font-bold text-gray-900">
+                                Welcome, {userData.firstName}{" "}
+                                {userData.lastName}
+                            </h2>
+                            <p className="text-gray-600">
+                                {userData.enrollmentNo} |{" "}
+                                {userData.branchId?.name} | Semester{" "}
+                                {userData.semester}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            )}
 
-    return MenuItem && <MenuItem />;
-  };
-
-  useEffect(() => {
-    const urlParams = new URLSearchParams(location.search);
-    const pathMenuId = urlParams.get("page") || "home";
-    const validMenu = MENU_ITEMS.find((item) => item.id === pathMenuId);
-    setSelectedMenu(validMenu ? validMenu.id : "home");
-  }, [location.pathname]);
-
-  const handleMenuClick = (menuId) => {
-    setSelectedMenu(menuId);
-    navigate(`/student?page=${menuId}`);
-  };
-
-  return (
-    <>
-      <Navbar />
-      <div className="max-w-7xl mx-auto mt-28">
-        <ul className="flex justify-evenly items-center gap-10 w-full mx-auto my-8">
-          {MENU_ITEMS.map((item) => (
-            <li
-              key={item.id}
-              className={getMenuItemClass(item.id)}
-              onClick={() => handleMenuClick(item.id)}
-            >
-              {item.label}
-            </li>
-          ))}
-        </ul>
-
-        {renderContent()}
-      </div>
-      <Toaster position="bottom-center" />
-    </>
-  );
+            {/* Quick Access Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {menuCards.map((card) => {
+                    const Icon = card.icon;
+                    return (
+                        <Link
+                            key={card.to}
+                            to={card.to}
+                            className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all group"
+                        >
+                            <div
+                                className={`w-12 h-12 ${card.color} rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}
+                            >
+                                <Icon className="w-6 h-6 text-white" />
+                            </div>
+                            <h3 className="text-lg font-semibold text-gray-900">
+                                {card.label}
+                            </h3>
+                            <p className="text-sm text-gray-500 mt-1">
+                                Click to view {card.label.toLowerCase()}
+                            </p>
+                        </Link>
+                    );
+                })}
+            </div>
+        </div>
+    );
 };
 
 export default Home;

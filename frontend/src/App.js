@@ -36,6 +36,12 @@ import FacultyExam from "./Screens/Exam";
 
 // ---------- Student Screens ----------
 import StudentHome from "./Screens/Student/Home";
+import StudentTimetable from "./Screens/Student/Timetable";
+import StudentMaterial from "./Screens/Student/Material";
+import StudentNotice from "./Screens/Notice";
+import StudentExam from "./Screens/Exam";
+import StudentMarks from "./Screens/Student/ViewMarks";
+import StudentProfile from "./Screens/Student/Profile";
 
 const App = () => {
     return (
@@ -207,6 +213,66 @@ const App = () => {
                             <ProtectedRoute>
                                 <StudentLayout>
                                     <StudentHome />
+                                </StudentLayout>
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/student/timetable"
+                        element={
+                            <ProtectedRoute>
+                                <StudentLayout>
+                                    <StudentTimetable />
+                                </StudentLayout>
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/student/material"
+                        element={
+                            <ProtectedRoute>
+                                <StudentLayout>
+                                    <StudentMaterial />
+                                </StudentLayout>
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/student/notice"
+                        element={
+                            <ProtectedRoute>
+                                <StudentLayout>
+                                    <StudentNotice />
+                                </StudentLayout>
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/student/exam"
+                        element={
+                            <ProtectedRoute>
+                                <StudentLayout>
+                                    <StudentExam />
+                                </StudentLayout>
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/student/marks"
+                        element={
+                            <ProtectedRoute>
+                                <StudentLayout>
+                                    <StudentMarks />
+                                </StudentLayout>
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/student/profile"
+                        element={
+                            <ProtectedRoute>
+                                <StudentLayout>
+                                    <StudentProfile />
                                 </StudentLayout>
                             </ProtectedRoute>
                         }
