@@ -121,7 +121,7 @@ const StudentFinder = () => {
     const resolveProfileImage = (profile) => {
         if (!profile) return "https://via.placeholder.com/48?text=User";
         if (/^https?:\/\//i.test(profile)) return profile;
-        const base = process.env.REACT_APP_MEDIA_LINK || "";
+        const base = import.meta.env.VITE_MEDIA_LINK || "";
         return `${base}/${profile}`.replace(/([^:]\/)\/+/g, "$1");
     };
 

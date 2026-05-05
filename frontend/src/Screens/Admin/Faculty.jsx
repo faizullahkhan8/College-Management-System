@@ -343,7 +343,7 @@ const Faculty = () => {
   const resolveProfileImage = (profile) => {
     if (!profile) return "https://via.placeholder.com/48?text=User";
     if (/^https?:\/\//i.test(profile)) return profile;
-    const mediaBase = process.env.REACT_APP_MEDIA_LINK || "";
+    const mediaBase = import.meta.env.VITE_MEDIA_LINK || "";
     return `${mediaBase}/${profile}`.replace(/([^:]\/)\/+/g, "$1");
   };
 
