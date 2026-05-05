@@ -22,6 +22,7 @@ import Faculty from "./Screens/Admin/Faculty";
 import Subject from "./Screens/Admin/Subject";
 import Branch from "./Screens/Admin/Branch";
 import AdminProfile from "./Screens/Admin/Profile";
+import AdminFees from "./Screens/Admin/Fees";
 
 // ---------- Faculty Screens ----------
 import FacultyHome from "./Screens/Faculty/Home";
@@ -42,6 +43,7 @@ import StudentNotice from "./Screens/Notice";
 import StudentExam from "./Screens/Exam";
 import StudentMarks from "./Screens/Student/ViewMarks";
 import StudentProfile from "./Screens/Student/Profile";
+import StudentFees from "./Screens/Student/Fees";
 
 const App = () => {
     return (
@@ -109,6 +111,16 @@ const App = () => {
                             <ProtectedRoute>
                                 <AdminLayout>
                                     <Branch />
+                                </AdminLayout>
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/admin/fees"
+                        element={
+                            <ProtectedRoute>
+                                <AdminLayout>
+                                    <AdminFees />
                                 </AdminLayout>
                             </ProtectedRoute>
                         }
@@ -273,6 +285,16 @@ const App = () => {
                             <ProtectedRoute>
                                 <StudentLayout>
                                     <StudentProfile />
+                                </StudentLayout>
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/student/fees"
+                        element={
+                            <ProtectedRoute>
+                                <StudentLayout>
+                                    <StudentFees />
                                 </StudentLayout>
                             </ProtectedRoute>
                         }

@@ -27,8 +27,13 @@ const Material = () => {
     useEffect(() => {
         const fetchSubjects = async () => {
             try {
+                const queryParams = new URLSearchParams();
+                if (userData.semester)
+                    queryParams.append("semester", userData.semester);
+                if (userData.branchId?._id)
+                    queryParams.append("branch", userData.branchId._id);
                 const response = await axiosWrapper.get(
-                    `/subject?semester=${userData.semester}&branch=${userData.branchId?._id}`,
+                    `/subject?${queryParams}`,
                     { headers: { Authorization: `Bearer ${userToken}` } },
                 );
                 if (response.data.success) {
@@ -55,10 +60,11 @@ const Material = () => {
     const fetchMaterials = async () => {
         setDataLoading(true);
         try {
-            const queryParams = new URLSearchParams({
-                semester: userData.semester,
-                branch: userData.branchId?._id,
-            });
+            const queryParams = new URLSearchParams();
+            if (userData.semester)
+                queryParams.append("semester", userData.semester);
+            if (userData.branchId?._id)
+                queryParams.append("branch", userData.branchId._id);
             if (filters.subject) queryParams.append("subject", filters.subject);
             if (filters.type) queryParams.append("type", filters.type);
 

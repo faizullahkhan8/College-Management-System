@@ -12,6 +12,7 @@ import {
     FiUser,
     FiBook,
     FiAward,
+    FiDollarSign,
 } from "react-icons/fi";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
@@ -43,6 +44,7 @@ const StudentLayout = ({ children }) => {
             { label: "Notice", icon: <FiBell />, to: "/student/notice" },
             { label: "Exam", icon: <FiClipboard />, to: "/student/exam" },
             { label: "Marks", icon: <FiAward />, to: "/student/marks" },
+            { label: "Fees", icon: <FiDollarSign />, to: "/student/fees" },
             { label: "Profile", icon: <FiUser />, to: "/student/profile" },
         ],
         [],

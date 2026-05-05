@@ -2,131 +2,142 @@ const Timetable = require("../models/timetable.model");
 const ApiResponse = require("../utils/ApiResponse");
 
 const getTimetableController = async (req, res) => {
-  try {
-    const { semester, branch } = req.query;
-    let query = {};
+    try {
+        const { semester, branch } = req.query;
+        let query = {};
 
-    if (semester) query.semester = semester;
-    if (branch) query.branch = branch;
+        if (semester && semester !== "undefined") query.semester = semester;
+        if (branch && branch !== "undefined") query.branch = branch;
 
-    const timetables = await Timetable.find(query)
-      .populate("branch")
-      .sort({ createdAt: -1 });
+        const timetables = await Timetable.find(query)
+            .populate("branch")
+            .sort({ createdAt: -1 });
 
-    if (!timetables || timetables.length === 0) {
-      return ApiResponse.notFound("No timetables found").send(res);
+        if (!timetables || timetables.length === 0) {
+            return ApiResponse.notFound("No timetables found").send(res);
+        }
+
+        return ApiResponse.success(
+            timetables,
+            "Timetables retrieved successfully",
+        ).send(res);
+    } catch (error) {
+        console.error("Get Timetable Error:", error);
+        return ApiResponse.internalServerError().send(res);
     }
-
-    return ApiResponse.success(
-      timetables,
-      "Timetables retrieved successfully"
-    ).send(res);
-  } catch (error) {
-    console.error("Get Timetable Error:", error);
-    return ApiResponse.internalServerError().send(res);
-  }
 };
 
 // ADD TIMETABLE
 const addTimetableController = async (req, res) => {
-  try {
-    const { semester, branch } = req.body;
+    try {
+        const { semester, branch } = req.body;
 
-    if (!semester || !branch) {
-      return ApiResponse.badRequest("Semester and branch are required").send(res);
+        if (!semester || !branch) {
+            return ApiResponse.badRequest(
+                "Semester and branch are required",
+            ).send(res);
+        }
+
+        if (!req.file) {
+            return ApiResponse.badRequest("Timetable file is required").send(
+                res,
+            );
+        }
+
+        // ✅ Multer-storage-cloudinary provides Cloudinary URL directly
+        const fileUrl = req.file.path;
+
+        let timetable = await Timetable.findOne({ semester, branch });
+
+        if (timetable) {
+            timetable = await Timetable.findByIdAndUpdate(
+                timetable._id,
+                { semester, branch, link: fileUrl },
+                { new: true },
+            );
+            return ApiResponse.success(
+                timetable,
+                "Timetable updated successfully",
+            ).send(res);
+        }
+
+        timetable = await Timetable.create({
+            semester,
+            branch,
+            link: fileUrl,
+        });
+
+        return ApiResponse.created(
+            timetable,
+            "Timetable added successfully",
+        ).send(res);
+    } catch (error) {
+        console.error("Add Timetable Error:", error);
+        return ApiResponse.internalServerError().send(res);
     }
-
-    if (!req.file) {
-      return ApiResponse.badRequest("Timetable file is required").send(res);
-    }
-
-    // ✅ Multer-storage-cloudinary provides Cloudinary URL directly
-    const fileUrl = req.file.path;
-
-    let timetable = await Timetable.findOne({ semester, branch });
-
-    if (timetable) {
-      timetable = await Timetable.findByIdAndUpdate(
-        timetable._id,
-        { semester, branch, link: fileUrl },
-        { new: true }
-      );
-      return ApiResponse.success(
-        timetable,
-        "Timetable updated successfully"
-      ).send(res);
-    }
-
-    timetable = await Timetable.create({
-      semester,
-      branch,
-      link: fileUrl,
-    });
-
-    return ApiResponse.created(timetable, "Timetable added successfully").send(res);
-  } catch (error) {
-    console.error("Add Timetable Error:", error);
-    return ApiResponse.internalServerError().send(res);
-  }
 };
 
 // UPDATE TIMETABLE
 const updateTimetableController = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { semester, branch } = req.body;
+    try {
+        const { id } = req.params;
+        const { semester, branch } = req.body;
 
-    if (!id) {
-      return ApiResponse.badRequest("Timetable ID is required").send(res);
+        if (!id) {
+            return ApiResponse.badRequest("Timetable ID is required").send(res);
+        }
+
+        const updateData = { semester, branch };
+
+        if (req.file) {
+            updateData.link = req.file.path; // ✅ Direct Cloudinary URL
+        }
+
+        const timetable = await Timetable.findByIdAndUpdate(id, updateData, {
+            new: true,
+        });
+
+        if (!timetable) {
+            return ApiResponse.notFound("Timetable not found").send(res);
+        }
+
+        return ApiResponse.success(
+            timetable,
+            "Timetable updated successfully",
+        ).send(res);
+    } catch (error) {
+        console.error("Update Timetable Error:", error);
+        return ApiResponse.internalServerError().send(res);
     }
-
-    const updateData = { semester, branch };
-
-    if (req.file) {
-      updateData.link = req.file.path; // ✅ Direct Cloudinary URL
-    }
-
-    const timetable = await Timetable.findByIdAndUpdate(id, updateData, { new: true });
-
-    if (!timetable) {
-      return ApiResponse.notFound("Timetable not found").send(res);
-    }
-
-    return ApiResponse.success(
-      timetable,
-      "Timetable updated successfully"
-    ).send(res);
-  } catch (error) {
-    console.error("Update Timetable Error:", error);
-    return ApiResponse.internalServerError().send(res);
-  }
 };
 
 // DELETE TIMETABLE
 const deleteTimetableController = async (req, res) => {
-  try {
-    const { id } = req.params;
+    try {
+        const { id } = req.params;
 
-    if (!id) {
-      return ApiResponse.badRequest("Timetable ID is required").send(res);
+        if (!id) {
+            return ApiResponse.badRequest("Timetable ID is required").send(res);
+        }
+
+        const timetable = await Timetable.findByIdAndDelete(id);
+
+        if (!timetable) {
+            return ApiResponse.notFound("Timetable not found").send(res);
+        }
+
+        return ApiResponse.success(null, "Timetable deleted successfully").send(
+            res,
+        );
+    } catch (error) {
+        console.error("Delete Timetable Error:", error);
+        return ApiResponse.internalServerError().send(res);
     }
-
-    const timetable = await Timetable.findByIdAndDelete(id);
-
-    if (!timetable) {
-      return ApiResponse.notFound("Timetable not found").send(res);
-    }
-
-    return ApiResponse.success(null, "Timetable deleted successfully").send(res);
-  } catch (error) {
-    console.error("Delete Timetable Error:", error);
-    return ApiResponse.internalServerError().send(res);
-  }
 };
 
 module.exports = {
-  getTimetableController,
-  addTimetableController,
-  updateTimetableController,
-  deleteTimetableController,
+    getTimetableController,
+    addTimetableController,
+    updateTimetableController,
+    deleteTimetableController,
 };
