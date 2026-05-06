@@ -134,7 +134,7 @@ const Material = () => {
 
             {/* Filter Bar */}
             <div className="my-6">
-                <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                <div>
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -144,7 +144,7 @@ const Material = () => {
                                 name="subject"
                                 value={searchParams.subject}
                                 onChange={handleSearchParamChange}
-                                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full px-4 py-2 border-gray-300 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                             >
                                 <option value="">All Subjects</option>
                                 {subjects.map((subject) => (
@@ -166,7 +166,7 @@ const Material = () => {
                                 name="type"
                                 value={searchParams.type}
                                 onChange={handleSearchParamChange}
-                                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full px-4 py-2 border-gray-300 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                             >
                                 <option value="">All Types</option>
                                 <option value="notes">Notes</option>

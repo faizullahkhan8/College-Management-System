@@ -25,7 +25,7 @@ const StudentLayout = ({ children }) => {
     const logout = () => {
         localStorage.removeItem("userToken");
         localStorage.removeItem("userType");
-        navigate("/login");
+        navigate("/");
     };
 
     const menuItems = useMemo(
@@ -69,7 +69,7 @@ const StudentLayout = ({ children }) => {
                 }`}
             >
                 <Sidebar width="260px" className="h-screen bg-white shadow-xl">
-                    <div className="flex items-center justify-between p-4 border-b">
+                    <div className="lg:hidden sticky top-0 z-30 bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between">
                         <h1 className="text-xl font-bold text-green-600">
                             Student Portal
                         </h1>

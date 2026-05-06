@@ -224,7 +224,7 @@ const Attendance = () => {
                                 name="date"
                                 value={filters.date}
                                 onChange={handleFilterChange}
-                                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full px-4 py-2 border-gray-300 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
                         </div>
 
@@ -236,7 +236,7 @@ const Attendance = () => {
                                 name="branch"
                                 value={filters.branch}
                                 onChange={handleFilterChange}
-                                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full px-4 py-2 border-gray-300 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                             >
                                 <option value="">Select Branch</option>
                                 {branches.map((b) => (
@@ -255,7 +255,7 @@ const Attendance = () => {
                                 name="semester"
                                 value={filters.semester}
                                 onChange={handleFilterChange}
-                                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full px-4 py-2 border-gray-300 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                             >
                                 <option value="">Select Semester</option>
                                 {[1, 2, 3, 4, 5, 6, 7, 8].map((s) => (
@@ -275,7 +275,7 @@ const Attendance = () => {
                                 value={filters.subject}
                                 onChange={handleFilterChange}
                                 disabled={!filters.branch}
-                                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                                     !filters.branch
                                         ? "bg-gray-100 cursor-not-allowed"
                                         : ""

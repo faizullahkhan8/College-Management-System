@@ -52,6 +52,12 @@ const menuCards = [
         to: "/student/profile",
         color: "bg-indigo-500",
     },
+    {
+        label: "Fees",
+        icon: FiFileText,
+        to: "/student/fees",
+        color: "bg-orange-500",
+    },
 ];
 
 const Home = () => {
@@ -94,29 +100,21 @@ const Home = () => {
 
     return (
         <div className="w-full mx-auto flex flex-col mb-10">
-            <Heading title="Student Dashboard" />
-
             {/* Welcome Section */}
             {userData && (
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8">
-                    <div className="flex items-center gap-4">
-                        <img
-                            src={userData.profile}
-                            alt="Profile"
-                            className="w-16 h-16 rounded-full object-cover ring-2 ring-green-500"
-                        />
-                        <div>
-                            <h2 className="text-2xl font-bold text-gray-900">
-                                Welcome, {userData.firstName}{" "}
-                                {userData.lastName}
-                            </h2>
-                            <p className="text-gray-600">
-                                {userData.enrollmentNo} |{" "}
-                                {userData.branchId?.name} | Semester{" "}
-                                {userData.semester}
-                            </p>
-                        </div>
-                    </div>
+                <div className="rounded-2xl md:p-8 my-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg">
+                    <p className="text-sm uppercase tracking-wider text-green-100">
+                        Welcome back
+                    </p>
+                    <h1 className="text-2xl md:text-4xl font-bold mt-1">
+                        {userData
+                            ? `${userData.firstName} ${userData.lastName}`
+                            : "Faculty Member"}
+                    </h1>
+                    <p className="mt-2 text-green-100">
+                        {userData?.branchId?.name} — Semester{" "}
+                        {userData?.semester}
+                    </p>
                 </div>
             )}
 

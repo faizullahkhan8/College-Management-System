@@ -35,7 +35,7 @@ const DataTable = ({
                                 {headerGroup.headers.map((header) => (
                                     <th
                                         key={header.id}
-                                        className="px-6 py-3 border-b text-left"
+                                        className="px-6 py-3 border-b border-gray-300 text-left"
                                     >
                                         {header.isPlaceholder
                                             ? null
@@ -62,7 +62,7 @@ const DataTable = ({
                                     {row.getVisibleCells().map((cell) => (
                                         <td
                                             key={cell.id}
-                                            className="px-6 py-4 border-b"
+                                            className="px-6 py-4 border-b border-gray-300"
                                         >
                                             {flexRender(
                                                 cell.column.columnDef.cell,

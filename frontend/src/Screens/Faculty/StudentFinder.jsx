@@ -175,7 +175,7 @@ const StudentFinder = () => {
                                 name="enrollmentNo"
                                 value={searchParams.enrollmentNo}
                                 onChange={handleInputChange}
-                                className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full px-4 py-2 border-gray-300 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 placeholder="Enter enrollment number"
                             />
                         </div>
@@ -189,7 +189,7 @@ const StudentFinder = () => {
                                 name="name"
                                 value={searchParams.name}
                                 onChange={handleInputChange}
-                                className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full px-4 py-2 border-gray-300 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 placeholder="Enter student name"
                             />
                         </div>
@@ -202,7 +202,7 @@ const StudentFinder = () => {
                                 name="semester"
                                 value={searchParams.semester}
                                 onChange={handleInputChange}
-                                className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full px-4 py-2 border-gray-300 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                             >
                                 <option value="">All Semesters</option>
                                 {[1, 2, 3, 4, 5, 6, 7, 8].map((sem) => (
@@ -221,7 +221,7 @@ const StudentFinder = () => {
                                 name="branch"
                                 value={searchParams.branch}
                                 onChange={handleInputChange}
-                                className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full px-4 py-2 border-gray-300 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                             >
                                 <option value="">All Branches</option>
                                 {branches?.map((branch) => (
@@ -265,7 +265,7 @@ const StudentFinder = () => {
                 </div>
 
                 {showModal && selectedStudent && (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                    <div className="fixed inset-0 bg-gray-500/50 flex items-center justify-center p-4 z-50">
                         <div className="bg-white rounded-lg p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
                             <div className="flex justify-between items-start mb-6">
                                 <h2 className="text-2xl font-bold">

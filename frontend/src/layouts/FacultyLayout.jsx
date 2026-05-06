@@ -25,26 +25,38 @@ const FacultyLayout = ({ children }) => {
     const logout = () => {
         localStorage.removeItem("userToken");
         localStorage.removeItem("userType");
-        navigate("/login");
+        navigate("/");
     };
 
     const menuItems = useMemo(
         () => [
             { label: "Dashboard", icon: <FiHome />, to: "/faculty" },
-            { label: "Timetable", icon: <FiCalendar />, to: "/faculty/timetable" },
-            { label: "Material", icon: <FiFileText />, to: "/faculty/material" },
+            {
+                label: "Timetable",
+                icon: <FiCalendar />,
+                to: "/faculty/timetable",
+            },
+            {
+                label: "Material",
+                icon: <FiFileText />,
+                to: "/faculty/material",
+            },
             { label: "Notice", icon: <FiBell />, to: "/faculty/notice" },
             {
                 label: "Student Info",
                 icon: <FiSearch />,
                 to: "/faculty/student-info",
             },
-            { label: "Attendance", icon: <FiCheckSquare />, to: "/faculty/attendance" },
+            {
+                label: "Attendance",
+                icon: <FiCheckSquare />,
+                to: "/faculty/attendance",
+            },
             { label: "Marks", icon: <FiEdit3 />, to: "/faculty/marks" },
             { label: "Exam", icon: <FiClipboard />, to: "/faculty/exam" },
             { label: "Profile", icon: <FiUser />, to: "/faculty/profile" },
         ],
-        []
+        [],
     );
 
     const isActive = (path) => location.pathname === path;
@@ -66,7 +78,7 @@ const FacultyLayout = ({ children }) => {
                 }`}
             >
                 <Sidebar width="260px" className="h-screen bg-white shadow-xl">
-                    <div className="flex items-center justify-between p-4 border-b h-16">
+                    <div className="lg:hidden sticky top-0 z-30 bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between">
                         <h1 className="text-xl font-bold text-green-600">
                             Faculty Portal
                         </h1>
@@ -167,7 +179,9 @@ const FacultyLayout = ({ children }) => {
                 </div>
 
                 {/* Page Content - Scrollable */}
-                <main className="flex-1 p-4 lg:p-8 overflow-y-auto">{children}</main>
+                <main className="flex-1 p-4 lg:p-8 overflow-y-auto">
+                    {children}
+                </main>
             </div>
         </div>
     );

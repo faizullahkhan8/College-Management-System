@@ -13,428 +13,485 @@ import Loading from "../components/Loading";
 import DataTable from "../components/DataTable";
 
 const Exam = () => {
-  const [data, setData] = useState({
-    name: "",
-    date: "",
-    semester: "",
-    examType: "mid",
-    timetableLink: "",
-    totalMarks: "",
-  });
-  const [exams, setExams] = useState();
-  const [showModal, setShowModal] = useState(false);
-  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
-  const [selectedExamId, setSelectedExamId] = useState(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [file, setFile] = useState(null);
-  const userData = useSelector((state) => state.userData);
-  const loginType = localStorage.getItem("userType");
-  const [processLoading, setProcessLoading] = useState(false);
-  const [dataLoading, setDataLoading] = useState(false);
-  const [filters, setFilters] = useState({ semester: "", examType: "" });
+    const [data, setData] = useState({
+        name: "",
+        date: "",
+        semester: "",
+        examType: "mid",
+        timetableLink: "",
+        totalMarks: "",
+    });
+    const [exams, setExams] = useState();
+    const [showModal, setShowModal] = useState(false);
+    const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+    const [selectedExamId, setSelectedExamId] = useState(null);
+    const [isEditing, setIsEditing] = useState(false);
+    const [file, setFile] = useState(null);
+    const userData = useSelector((state) => state.userData);
+    const loginType = localStorage.getItem("userType");
+    const [processLoading, setProcessLoading] = useState(false);
+    const [dataLoading, setDataLoading] = useState(false);
+    const [filters, setFilters] = useState({ semester: "", examType: "" });
 
-  useEffect(() => {
-    getExamsHandler();
-  }, []);
+    useEffect(() => {
+        getExamsHandler();
+    }, []);
 
-  const getExamsHandler = async () => {
-    try {
-      setDataLoading(true);
-      let link = "/exam";
-      if (userData.semester) {
-        link = `/exam?semester=${userData.semester}`;
-      }
-      const response = await axiosWrapper.get(link, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("userToken")}`,
-        },
-      });
-      if (response.data.success) {
-        setExams(response.data.data);
-      } else {
-        toast.error(response.data.message);
-      }
-    } catch (error) {
-      if (error.response?.status === 404) {
-        setExams([]);
-        return;
-      }
-      console.error(error);
-      toast.error(error.response?.data?.message || "Error fetching exams");
-    } finally {
-      setDataLoading(false);
-    }
-  };
+    const getExamsHandler = async () => {
+        try {
+            setDataLoading(true);
+            let link = "/exam";
+            if (userData.semester) {
+                link = `/exam?semester=${userData.semester}`;
+            }
+            const response = await axiosWrapper.get(link, {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+                },
+            });
+            if (response.data.success) {
+                setExams(response.data.data);
+            } else {
+                toast.error(response.data.message);
+            }
+        } catch (error) {
+            if (error.response?.status === 404) {
+                setExams([]);
+                return;
+            }
+            console.error(error);
+            toast.error(
+                error.response?.data?.message || "Error fetching exams",
+            );
+        } finally {
+            setDataLoading(false);
+        }
+    };
 
-  const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
-  };
+    const handleFileChange = (e) => {
+        setFile(e.target.files[0]);
+    };
 
-  const addExamHandler = async () => {
-    if (
-      !data.name ||
-      !data.date ||
-      !data.semester ||
-      !data.examType ||
-      !data.totalMarks
-    ) {
-      toast.dismiss();
-      toast.error("Please fill all the fields");
-      return;
-    }
-    try {
-      setProcessLoading(true);
-      toast.loading(isEditing ? "Updating Exam" : "Adding Exam");
-      const headers = {
-        "Content-Type": "multipart/form-data",
-        Authorization: `Bearer ${localStorage.getItem("userToken")}`,
-      };
-      let response;
-      const formData = new FormData();
-      formData.append("name", data.name);
-      formData.append("date", data.date);
-      formData.append("semester", data.semester);
-      formData.append("examType", data.examType);
-      formData.append("totalMarks", data.totalMarks);
-      if (isEditing) {
-        formData.append("file", file);
-        response = await axiosWrapper.patch(
-          `/exam/${selectedExamId}`,
-          formData,
-          {
-            headers: headers,
-          }
-        );
-      } else {
-        formData.append("file", file);
-        response = await axiosWrapper.post(`/exam`, formData, {
-          headers: headers,
+    const addExamHandler = async () => {
+        if (
+            !data.name ||
+            !data.date ||
+            !data.semester ||
+            !data.examType ||
+            !data.totalMarks
+        ) {
+            toast.dismiss();
+            toast.error("Please fill all the fields");
+            return;
+        }
+        try {
+            setProcessLoading(true);
+            toast.loading(isEditing ? "Updating Exam" : "Adding Exam");
+            const headers = {
+                "Content-Type": "multipart/form-data",
+                Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+            };
+            let response;
+            const formData = new FormData();
+            formData.append("name", data.name);
+            formData.append("date", data.date);
+            formData.append("semester", data.semester);
+            formData.append("examType", data.examType);
+            formData.append("totalMarks", data.totalMarks);
+            if (isEditing) {
+                formData.append("file", file);
+                response = await axiosWrapper.patch(
+                    `/exam/${selectedExamId}`,
+                    formData,
+                    {
+                        headers: headers,
+                    },
+                );
+            } else {
+                formData.append("file", file);
+                response = await axiosWrapper.post(`/exam`, formData, {
+                    headers: headers,
+                });
+            }
+            toast.dismiss();
+            if (response.data.success) {
+                toast.success(response.data.message);
+                resetForm();
+                getExamsHandler();
+            } else {
+                toast.error(response.data.message);
+            }
+        } catch (error) {
+            toast.dismiss();
+            toast.error(error.response.data.message);
+        } finally {
+            setProcessLoading(false);
+        }
+    };
+
+    const resetForm = () => {
+        setData({
+            name: "",
+            date: "",
+            semester: "",
+            examType: "mid",
+            timetableLink: "",
+            totalMarks: "",
         });
-      }
-      toast.dismiss();
-      if (response.data.success) {
-        toast.success(response.data.message);
-        resetForm();
-        getExamsHandler();
-      } else {
-        toast.error(response.data.message);
-      }
-    } catch (error) {
-      toast.dismiss();
-      toast.error(error.response.data.message);
-    } finally {
-      setProcessLoading(false);
-    }
-  };
+        setShowModal(false);
+        setIsEditing(false);
+        setSelectedExamId(null);
+    };
 
-  const resetForm = () => {
-    setData({
-      name: "",
-      date: "",
-      semester: "",
-      examType: "mid",
-      timetableLink: "",
-      totalMarks: "",
-    });
-    setShowModal(false);
-    setIsEditing(false);
-    setSelectedExamId(null);
-  };
+    const deleteExamHandler = async (id) => {
+        setIsDeleteConfirmOpen(true);
+        setSelectedExamId(id);
+    };
 
-  const deleteExamHandler = async (id) => {
-    setIsDeleteConfirmOpen(true);
-    setSelectedExamId(id);
-  };
+    const editExamHandler = (exam) => {
+        setData({
+            name: exam.name,
+            date: new Date(exam.date).toISOString().split("T")[0],
+            semester: exam.semester,
+            examType: exam.examType,
+            timetableLink: exam.timetableLink,
+            totalMarks: exam.totalMarks,
+        });
+        setSelectedExamId(exam._id);
+        setIsEditing(true);
+        setShowModal(true);
+    };
 
-  const editExamHandler = (exam) => {
-    setData({
-      name: exam.name,
-      date: new Date(exam.date).toISOString().split("T")[0],
-      semester: exam.semester,
-      examType: exam.examType,
-      timetableLink: exam.timetableLink,
-      totalMarks: exam.totalMarks,
-    });
-    setSelectedExamId(exam._id);
-    setIsEditing(true);
-    setShowModal(true);
-  };
+    const confirmDelete = async () => {
+        try {
+            toast.loading("Deleting Exam");
+            const headers = {
+                "Content-Type": "multipart/form-data",
+                Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+            };
+            const response = await axiosWrapper.delete(
+                `/exam/${selectedExamId}`,
+                {
+                    headers: headers,
+                },
+            );
+            toast.dismiss();
+            if (response.data.success) {
+                toast.success("Exam has been deleted successfully");
+                setIsDeleteConfirmOpen(false);
+                getExamsHandler();
+            } else {
+                toast.error(response.data.message);
+            }
+        } catch (error) {
+            toast.dismiss();
+            toast.error(error.response.data.message);
+        }
+    };
 
-  const confirmDelete = async () => {
-    try {
-      toast.loading("Deleting Exam");
-      const headers = {
-        "Content-Type": "multipart/form-data",
-        Authorization: `Bearer ${localStorage.getItem("userToken")}`,
-      };
-      const response = await axiosWrapper.delete(`/exam/${selectedExamId}`, {
-        headers: headers,
-      });
-      toast.dismiss();
-      if (response.data.success) {
-        toast.success("Exam has been deleted successfully");
-        setIsDeleteConfirmOpen(false);
-        getExamsHandler();
-      } else {
-        toast.error(response.data.message);
-      }
-    } catch (error) {
-      toast.dismiss();
-      toast.error(error.response.data.message);
-    }
-  };
+    const filteredExams = useMemo(() => {
+        if (!exams) return [];
+        return exams.filter((item) => {
+            const bySemester = filters.semester
+                ? String(item.semester) === String(filters.semester)
+                : true;
+            const byExamType = filters.examType
+                ? item.examType === filters.examType
+                : true;
+            return bySemester && byExamType;
+        });
+    }, [exams, filters]);
 
-  const filteredExams = useMemo(() => {
-    if (!exams) return [];
-    return exams.filter((item) => {
-      const bySemester = filters.semester
-        ? String(item.semester) === String(filters.semester)
-        : true;
-      const byExamType = filters.examType
-        ? item.examType === filters.examType
-        : true;
-      return bySemester && byExamType;
-    });
-  }, [exams, filters]);
+    const examColumns = useMemo(
+        () => [
+            { header: "Exam Name", accessorKey: "name" },
+            {
+                header: "Date",
+                cell: ({ row }) =>
+                    new Date(row.original.date).toLocaleDateString(),
+            },
+            { header: "Semester", accessorKey: "semester" },
+            {
+                header: "Exam Type",
+                cell: ({ row }) =>
+                    row.original.examType === "mid" ? "Mid Term" : "End Term",
+            },
+            { header: "Total Marks", accessorKey: "totalMarks" },
+            ...(loginType !== "Student"
+                ? [
+                      {
+                          header: "Actions",
+                          cell: ({ row }) => (
+                              <div className="flex justify-center gap-4">
+                                  <CustomButton
+                                      variant="secondary"
+                                      className="!p-2"
+                                      onClick={() =>
+                                          editExamHandler(row.original)
+                                      }
+                                  >
+                                      <MdEdit />
+                                  </CustomButton>
+                                  <CustomButton
+                                      variant="danger"
+                                      className="!p-2"
+                                      onClick={() =>
+                                          deleteExamHandler(row.original._id)
+                                      }
+                                  >
+                                      <MdOutlineDelete />
+                                  </CustomButton>
+                              </div>
+                          ),
+                      },
+                  ]
+                : []),
+        ],
+        [loginType],
+    );
 
-  const examColumns = useMemo(
-    () => [
-      { header: "Exam Name", accessorKey: "name" },
-      {
-        header: "Date",
-        cell: ({ row }) => new Date(row.original.date).toLocaleDateString(),
-      },
-      { header: "Semester", accessorKey: "semester" },
-      {
-        header: "Exam Type",
-        cell: ({ row }) =>
-          row.original.examType === "mid" ? "Mid Term" : "End Term",
-      },
-      { header: "Total Marks", accessorKey: "totalMarks" },
-      ...(loginType !== "Student"
-        ? [
-          {
-            header: "Actions",
-            cell: ({ row }) => (
-              <div className="flex justify-center gap-4">
-                <CustomButton
-                  variant="secondary"
-                  className="!p-2"
-                  onClick={() => editExamHandler(row.original)}
-                >
-                  <MdEdit />
-                </CustomButton>
-                <CustomButton
-                  variant="danger"
-                  className="!p-2"
-                  onClick={() => deleteExamHandler(row.original._id)}
-                >
-                  <MdOutlineDelete />
-                </CustomButton>
-              </div>
-            ),
-          },
-        ]
-        : []),
-    ],
-    [loginType]
-  );
-
-  return (
-    <div className="w-full mx-auto flex justify-center items-start flex-col mb-10">
-      <div className="flex justify-between items-center w-full">
-        <Heading title="Exam Details" />
-        {!dataLoading && loginType !== "Student" && (
-          <CustomButton onClick={() => setShowModal(true)}>
-            <IoMdAdd className="text-2xl" />
-          </CustomButton>
-        )}
-      </div>
-
-      {!dataLoading ? (
-        <div className="mt-8 w-full">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            <select
-              value={filters.semester}
-              onChange={(e) =>
-                setFilters((prev) => ({ ...prev, semester: e.target.value }))
-              }
-              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">All Semesters</option>
-              {[1, 2, 3, 4, 5, 6, 7, 8].map((sem) => (
-                <option key={sem} value={sem}>
-                  Semester {sem}
-                </option>
-              ))}
-            </select>
-            <select
-              value={filters.examType}
-              onChange={(e) =>
-                setFilters((prev) => ({ ...prev, examType: e.target.value }))
-              }
-              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">All Exam Types</option>
-              <option value="mid">Mid Term</option>
-              <option value="end">End Term</option>
-            </select>
-          </div>
-
-          <DataTable data={filteredExams} columns={examColumns} pageSize={10} />
-        </div>
-      ) : (
-        <Loading />
-      )}
-
-      {/* Add/Edit Exam Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg p-6 max-w-2xl w-full">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">
-                {isEditing ? "Edit Exam" : "Add New Exam"}
-              </h2>
-              <CustomButton onClick={resetForm} variant="secondary">
-                <AiOutlineClose size={24} />
-              </CustomButton>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Exam Name
-                </label>
-                <input
-                  type="text"
-                  value={data.name}
-                  onChange={(e) => setData({ ...data, name: e.target.value })}
-                  className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Date
-                  </label>
-                  <input
-                    type="date"
-                    value={data.date}
-                    onChange={(e) => setData({ ...data, date: e.target.value })}
-                    className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Semester
-                  </label>
-                  <select
-                    name="semester"
-                    value={data.semester}
-                    onChange={(e) =>
-                      setData({ ...data, semester: e.target.value })
-                    }
-                    className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                  >
-                    <option value="">Select Semester</option>
-                    {[1, 2, 3, 4, 5, 6, 7, 8].map((sem) => (
-                      <option key={sem} value={sem}>
-                        Semester {sem}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Exam Type
-                  </label>
-                  <select
-                    value={data.examType}
-                    onChange={(e) =>
-                      setData({ ...data, examType: e.target.value })
-                    }
-                    className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                  >
-                    <option value="mid">Mid Term</option>
-                    <option value="end">End Term</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Total Marks
-                  </label>
-                  <input
-                    type="number"
-                    value={data.totalMarks}
-                    onChange={(e) =>
-                      setData({ ...data, totalMarks: e.target.value })
-                    }
-                    className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Timetable File
-                </label>
-                <div className="flex items-center space-x-4">
-                  <label className="flex-1 px-4 py-2 border rounded-md cursor-pointer hover:bg-gray-50">
-                    <span className="flex items-center justify-center">
-                      <FiUpload className="mr-2" />
-                      {file ? file.name : "Choose File"}
-                    </span>
-                    <input
-                      type="file"
-                      onChange={handleFileChange}
-                      className="hidden"
-                      required={!isEditing}
-                    />
-                  </label>
-                  {file && (
-                    <CustomButton
-                      onClick={() => setFile(null)}
-                      variant="danger"
-                      className="!p-2"
-                    >
-                      <AiOutlineClose size={20} />
+    return (
+        <div className="w-full mx-auto flex justify-center items-start flex-col mb-10">
+            <div className="flex justify-between items-center w-full">
+                <Heading title="Exam Details" />
+                {!dataLoading && loginType !== "Student" && (
+                    <CustomButton onClick={() => setShowModal(true)}>
+                        <IoMdAdd className="text-2xl" />
                     </CustomButton>
-                  )}
-                </div>
-              </div>
-
-              <div className="flex justify-end space-x-4 mt-6">
-                <CustomButton onClick={resetForm} variant="secondary">
-                  Cancel
-                </CustomButton>
-                <CustomButton
-                  onClick={addExamHandler}
-                  disabled={processLoading}
-                >
-                  {isEditing ? "Update Exam" : "Add Exam"}
-                </CustomButton>
-              </div>
+                )}
             </div>
-          </div>
-        </div>
-      )}
 
-      <DeleteConfirm
-        isOpen={isDeleteConfirmOpen}
-        onClose={() => setIsDeleteConfirmOpen(false)}
-        onConfirm={confirmDelete}
-        message="Are you sure you want to delete this exam?"
-      />
-    </div>
-  );
+            {!dataLoading ? (
+                <div className="mt-8 w-full">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Semester
+                            </label>
+                            <select
+                                value={filters.semester}
+                                onChange={(e) =>
+                                    setFilters((prev) => ({
+                                        ...prev,
+                                        semester: e.target.value,
+                                    }))
+                                }
+                                className="w-full px-4 py-2 border-gray-300 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                                <option value="">All Semesters</option>
+                                {[1, 2, 3, 4, 5, 6, 7, 8].map((sem) => (
+                                    <option key={sem} value={sem}>
+                                        Semester {sem}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Exam Type
+                            </label>
+                            <select
+                                value={filters.examType}
+                                onChange={(e) =>
+                                    setFilters((prev) => ({
+                                        ...prev,
+                                        examType: e.target.value,
+                                    }))
+                                }
+                                className="w-full px-4 py-2 border-gray-300 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                                <option value="">All Exam Types</option>
+                                <option value="mid">Mid Term</option>
+                                <option value="end">End Term</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <DataTable
+                        data={filteredExams}
+                        columns={examColumns}
+                        pageSize={10}
+                    />
+                </div>
+            ) : (
+                <Loading />
+            )}
+
+            {/* Add/Edit Exam Modal */}
+            {showModal && (
+                <div className="fixed inset-0 bg-gray-500/50 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-lg p-6 max-w-2xl w-full">
+                        <div className="flex justify-between items-center mb-4">
+                            <h2 className="text-xl font-semibold">
+                                {isEditing ? "Edit Exam" : "Add New Exam"}
+                            </h2>
+                            <CustomButton
+                                onClick={resetForm}
+                                variant="secondary"
+                            >
+                                <AiOutlineClose size={24} />
+                            </CustomButton>
+                        </div>
+
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Exam Name
+                                </label>
+                                <input
+                                    type="text"
+                                    value={data.name}
+                                    onChange={(e) =>
+                                        setData({
+                                            ...data,
+                                            name: e.target.value,
+                                        })
+                                    }
+                                    className="w-full px-4 py-2 border-gray-300 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    required
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Date
+                                    </label>
+                                    <input
+                                        type="date"
+                                        value={data.date}
+                                        onChange={(e) =>
+                                            setData({
+                                                ...data,
+                                                date: e.target.value,
+                                            })
+                                        }
+                                        className="w-full px-4 py-2 border-gray-300 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Semester
+                                    </label>
+                                    <select
+                                        name="semester"
+                                        value={data.semester}
+                                        onChange={(e) =>
+                                            setData({
+                                                ...data,
+                                                semester: e.target.value,
+                                            })
+                                        }
+                                        className="w-full px-4 py-2 border-gray-300 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        required
+                                    >
+                                        <option value="">
+                                            Select Semester
+                                        </option>
+                                        {[1, 2, 3, 4, 5, 6, 7, 8].map((sem) => (
+                                            <option key={sem} value={sem}>
+                                                Semester {sem}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Exam Type
+                                    </label>
+                                    <select
+                                        value={data.examType}
+                                        onChange={(e) =>
+                                            setData({
+                                                ...data,
+                                                examType: e.target.value,
+                                            })
+                                        }
+                                        className="w-full px-4 py-2 border-gray-300 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        required
+                                    >
+                                        <option value="mid">Mid Term</option>
+                                        <option value="end">End Term</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Total Marks
+                                    </label>
+                                    <input
+                                        type="number"
+                                        value={data.totalMarks}
+                                        onChange={(e) =>
+                                            setData({
+                                                ...data,
+                                                totalMarks: e.target.value,
+                                            })
+                                        }
+                                        className="w-full px-4 py-2 border-gray-300 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        required
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Timetable File
+                                </label>
+                                <div className="flex items-center space-x-4">
+                                    <label className="flex-1 px-4 py-2 border-gray-300 border rounded-md cursor-pointer hover:bg-gray-50">
+                                        <span className="flex items-center justify-center">
+                                            <FiUpload className="mr-2" />
+                                            {file ? file.name : "Choose File"}
+                                        </span>
+                                        <input
+                                            type="file"
+                                            onChange={handleFileChange}
+                                            className="hidden"
+                                            required={!isEditing}
+                                        />
+                                    </label>
+                                    {file && (
+                                        <CustomButton
+                                            onClick={() => setFile(null)}
+                                            variant="danger"
+                                            className="!p-2"
+                                        >
+                                            <AiOutlineClose size={20} />
+                                        </CustomButton>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="flex justify-end space-x-4 mt-6">
+                                <CustomButton
+                                    onClick={resetForm}
+                                    variant="secondary"
+                                >
+                                    Cancel
+                                </CustomButton>
+                                <CustomButton
+                                    onClick={addExamHandler}
+                                    disabled={processLoading}
+                                >
+                                    {isEditing ? "Update Exam" : "Add Exam"}
+                                </CustomButton>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            <DeleteConfirm
+                isOpen={isDeleteConfirmOpen}
+                onClose={() => setIsDeleteConfirmOpen(false)}
+                onConfirm={confirmDelete}
+                message="Are you sure you want to delete this exam?"
+            />
+        </div>
+    );
 };
 
 export default Exam;

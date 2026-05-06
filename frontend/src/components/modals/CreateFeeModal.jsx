@@ -21,12 +21,10 @@ const CreateFeeModal = ({
     if (!show) return null;
 
     return (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-gray-500/50 z-50 flex items-center justify-center p-4">
             <div className="bg-white rounded-xl shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
-                <div className="p-6 border-b flex justify-between items-center">
-                    <h2 className="text-xl font-bold">
-                        Create Fee Structure
-                    </h2>
+                <div className="p-6 border-b border-gray-300 flex justify-between items-center">
+                    <h2 className="text-xl font-bold">Create Fee Structure</h2>
                     <button
                         onClick={onClose}
                         className="p-2 hover:bg-gray-100 rounded-lg"
@@ -35,10 +33,7 @@ const CreateFeeModal = ({
                     </button>
                 </div>
 
-                <form
-                    onSubmit={onSubmit}
-                    className="p-6 space-y-6"
-                >
+                <form onSubmit={onSubmit} className="p-6 space-y-6">
                     {/* Basic Info */}
                     <div>
                         <h3 className="text-lg font-semibold mb-4 flex items-center">
@@ -55,7 +50,7 @@ const CreateFeeModal = ({
                                     name="title"
                                     value={formData.title}
                                     onChange={onInputChange}
-                                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                                    className="w-full px-4 py-2 border-gray-300 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                                     required
                                 />
                             </div>
@@ -68,7 +63,7 @@ const CreateFeeModal = ({
                                     name="description"
                                     value={formData.description}
                                     onChange={onInputChange}
-                                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                                    className="w-full px-4 py-2 border-gray-300 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                                 />
                             </div>
                         </div>
@@ -90,7 +85,7 @@ const CreateFeeModal = ({
                                     name="amount"
                                     value={formData.amount}
                                     onChange={onInputChange}
-                                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                                    className="w-full px-4 py-2 border-gray-300 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                                     required
                                     min="0"
                                 />
@@ -104,7 +99,7 @@ const CreateFeeModal = ({
                                     name="lastDate"
                                     value={formData.lastDate}
                                     onChange={onInputChange}
-                                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                                    className="w-full px-4 py-2 border-gray-300 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                                     required
                                 />
                             </div>
@@ -117,7 +112,7 @@ const CreateFeeModal = ({
                                     name="lateFee"
                                     value={formData.lateFee}
                                     onChange={onInputChange}
-                                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                                    className="w-full px-4 py-2 border-gray-300 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                                     min="0"
                                 />
                             </div>
@@ -139,7 +134,7 @@ const CreateFeeModal = ({
                                     name="targetType"
                                     value={formData.targetType}
                                     onChange={onInputChange}
-                                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                                    className="w-full px-4 py-2 border-gray-300 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                                 >
                                     {targetTypes.map((type) => (
                                         <option
@@ -161,7 +156,7 @@ const CreateFeeModal = ({
                                         {branches.map((branch) => (
                                             <label
                                                 key={branch._id}
-                                                className="flex items-center p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
+                                                className="flex items-center p-3 border-gray-300 border rounded-lg hover:bg-gray-50 cursor-pointer"
                                             >
                                                 <input
                                                     type="checkbox"
@@ -169,22 +164,19 @@ const CreateFeeModal = ({
                                                         branch._id,
                                                     )}
                                                     onChange={(e) => {
-                                                        const newBranches =
-                                                            e.target
-                                                                .checked
-                                                                ? [
-                                                                      ...formData
-                                                                          .targets
-                                                                          .branches,
+                                                        const newBranches = e
+                                                            .target.checked
+                                                            ? [
+                                                                  ...formData
+                                                                      .targets
+                                                                      .branches,
+                                                                  branch._id,
+                                                              ]
+                                                            : formData.targets.branches.filter(
+                                                                  (id) =>
+                                                                      id !==
                                                                       branch._id,
-                                                                  ]
-                                                                : formData.targets.branches.filter(
-                                                                      (
-                                                                          id,
-                                                                      ) =>
-                                                                          id !==
-                                                                          branch._id,
-                                                                  );
+                                                              );
                                                         onTargetChange(
                                                             "branches",
                                                             newBranches,
@@ -210,7 +202,7 @@ const CreateFeeModal = ({
                                         {semesters.map((sem) => (
                                             <label
                                                 key={sem}
-                                                className="flex items-center p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
+                                                className="flex items-center p-3 border-gray-300 border rounded-lg hover:bg-gray-50 cursor-pointer"
                                             >
                                                 <input
                                                     type="checkbox"
@@ -218,22 +210,18 @@ const CreateFeeModal = ({
                                                         sem,
                                                     )}
                                                     onChange={(e) => {
-                                                        const newSemesters =
-                                                            e.target
-                                                                .checked
-                                                                ? [
-                                                                      ...formData
-                                                                          .targets
-                                                                          .semesters,
-                                                                      sem,
-                                                                  ]
-                                                                : formData.targets.semesters.filter(
-                                                                      (
-                                                                          s,
-                                                                      ) =>
-                                                                          s !==
-                                                                          sem,
-                                                                  );
+                                                        const newSemesters = e
+                                                            .target.checked
+                                                            ? [
+                                                                  ...formData
+                                                                      .targets
+                                                                      .semesters,
+                                                                  sem,
+                                                              ]
+                                                            : formData.targets.semesters.filter(
+                                                                  (s) =>
+                                                                      s !== sem,
+                                                              );
                                                         onTargetChange(
                                                             "semesters",
                                                             newSemesters,
@@ -255,28 +243,33 @@ const CreateFeeModal = ({
                                     <label className="block text-sm font-medium mb-2">
                                         Select Students
                                     </label>
-                                    
+
                                     {/* Student Search */}
                                     <div className="mb-4">
                                         <input
                                             type="text"
                                             placeholder="Search students by name..."
-                                            onChange={(e) => searchStudents(e.target.value)}
-                                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                                            onChange={(e) =>
+                                                searchStudents(e.target.value)
+                                            }
+                                            className="w-full px-4 py-2 border-gray-300 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                                         />
                                     </div>
 
                                     {/* Search Results */}
                                     {students.length > 0 && (
-                                        <div className="mb-4 max-h-40 overflow-y-auto border rounded-lg p-2">
+                                        <div className="mb-4 max-h-40 overflow-y-auto border-gray-300 border rounded-lg p-2">
                                             {students.map((student) => (
                                                 <div
                                                     key={student._id}
                                                     className="p-2 hover:bg-gray-50 cursor-pointer rounded"
-                                                    onClick={() => addStudent(student)}
+                                                    onClick={() =>
+                                                        addStudent(student)
+                                                    }
                                                 >
                                                     <div className="font-medium">
-                                                        {student.firstName} {student.lastName}
+                                                        {student.firstName}{" "}
+                                                        {student.lastName}
                                                     </div>
                                                     <div className="text-sm text-gray-500">
                                                         {student.enrollmentNo}
@@ -301,11 +294,17 @@ const CreateFeeModal = ({
                                                         >
                                                             <div>
                                                                 <div className="font-medium text-sm">
-                                                                    {student.firstName}{" "}
-                                                                    {student.lastName}
+                                                                    {
+                                                                        student.firstName
+                                                                    }{" "}
+                                                                    {
+                                                                        student.lastName
+                                                                    }
                                                                 </div>
                                                                 <div className="text-xs text-gray-500">
-                                                                    {student.enrollmentNo}
+                                                                    {
+                                                                        student.enrollmentNo
+                                                                    }
                                                                 </div>
                                                             </div>
                                                             <button
@@ -331,7 +330,7 @@ const CreateFeeModal = ({
                     </div>
 
                     {/* Actions */}
-                    <div className="flex justify-end gap-3 pt-4 border-t">
+                    <div className="flex justify-end gap-3 pt-4">
                         <CustomButton
                             type="button"
                             variant="secondary"

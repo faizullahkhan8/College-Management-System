@@ -29,7 +29,9 @@ const Profile = () => {
                     toast.error(response.data.message);
                 }
             } catch (error) {
-                toast.error(error.response?.data?.message || "Error fetching profile");
+                toast.error(
+                    error.response?.data?.message || "Error fetching profile",
+                );
             } finally {
                 setIsLoading(false);
             }
@@ -59,11 +61,9 @@ const Profile = () => {
 
     return (
         <div className="w-full mx-auto flex flex-col mb-10">
-            <Heading title="My Profile" />
-
-            <div className="max-w-6xl mx-auto w-full p-8">
+            <div className="max-w-7xl mx-auto w-full">
                 {/* Header Section */}
-                <div className="flex items-center gap-8 mb-12 border-b pb-8 justify-between">
+                <div className="flex items-center gap-8 mb-12 border-b border-gray-300 pb-8 justify-between">
                     <div className="flex items-center gap-8">
                         <img
                             src={profileData.profile}
@@ -84,7 +84,9 @@ const Profile = () => {
                     </div>
                     <div className="flex items-center gap-8 justify-end">
                         <CustomButton
-                            onClick={() => setShowPasswordUpdate(!showPasswordUpdate)}
+                            onClick={() =>
+                                setShowPasswordUpdate(!showPasswordUpdate)
+                            }
                             variant="primary"
                         >
                             {showPasswordUpdate ? "Hide" : "Update Password"}
@@ -105,28 +107,52 @@ const Profile = () => {
                         </h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             <div>
-                                <label className="text-sm font-medium text-gray-500">Email</label>
-                                <p className="text-gray-900">{profileData.email}</p>
+                                <label className="text-sm font-medium text-gray-500">
+                                    Email
+                                </label>
+                                <p className="text-gray-900">
+                                    {profileData.email}
+                                </p>
                             </div>
                             <div>
-                                <label className="text-sm font-medium text-gray-500">Phone</label>
-                                <p className="text-gray-900">{profileData.phone}</p>
+                                <label className="text-sm font-medium text-gray-500">
+                                    Phone
+                                </label>
+                                <p className="text-gray-900">
+                                    {profileData.phone}
+                                </p>
                             </div>
                             <div>
-                                <label className="text-sm font-medium text-gray-500">Gender</label>
-                                <p className="text-gray-900 capitalize">{profileData.gender}</p>
+                                <label className="text-sm font-medium text-gray-500">
+                                    Gender
+                                </label>
+                                <p className="text-gray-900 capitalize">
+                                    {profileData.gender}
+                                </p>
                             </div>
                             <div>
-                                <label className="text-sm font-medium text-gray-500">Blood Group</label>
-                                <p className="text-gray-900">{profileData.bloodGroup}</p>
+                                <label className="text-sm font-medium text-gray-500">
+                                    Blood Group
+                                </label>
+                                <p className="text-gray-900">
+                                    {profileData.bloodGroup}
+                                </p>
                             </div>
                             <div>
-                                <label className="text-sm font-medium text-gray-500">Date of Birth</label>
-                                <p className="text-gray-900">{formatDate(profileData.dob)}</p>
+                                <label className="text-sm font-medium text-gray-500">
+                                    Date of Birth
+                                </label>
+                                <p className="text-gray-900">
+                                    {formatDate(profileData.dob)}
+                                </p>
                             </div>
                             <div>
-                                <label className="text-sm font-medium text-gray-500">Semester</label>
-                                <p className="text-gray-900">{profileData.semester}</p>
+                                <label className="text-sm font-medium text-gray-500">
+                                    Semester
+                                </label>
+                                <p className="text-gray-900">
+                                    {profileData.semester}
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -138,24 +164,44 @@ const Profile = () => {
                         </h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             <div>
-                                <label className="text-sm font-medium text-gray-500">Address</label>
-                                <p className="text-gray-900">{profileData.address}</p>
+                                <label className="text-sm font-medium text-gray-500">
+                                    Address
+                                </label>
+                                <p className="text-gray-900">
+                                    {profileData.address}
+                                </p>
                             </div>
                             <div>
-                                <label className="text-sm font-medium text-gray-500">City</label>
-                                <p className="text-gray-900">{profileData.city}</p>
+                                <label className="text-sm font-medium text-gray-500">
+                                    City
+                                </label>
+                                <p className="text-gray-900">
+                                    {profileData.city}
+                                </p>
                             </div>
                             <div>
-                                <label className="text-sm font-medium text-gray-500">State</label>
-                                <p className="text-gray-900">{profileData.state}</p>
+                                <label className="text-sm font-medium text-gray-500">
+                                    State
+                                </label>
+                                <p className="text-gray-900">
+                                    {profileData.state}
+                                </p>
                             </div>
                             <div>
-                                <label className="text-sm font-medium text-gray-500">Pincode</label>
-                                <p className="text-gray-900">{profileData.pincode}</p>
+                                <label className="text-sm font-medium text-gray-500">
+                                    Pincode
+                                </label>
+                                <p className="text-gray-900">
+                                    {profileData.pincode}
+                                </p>
                             </div>
                             <div>
-                                <label className="text-sm font-medium text-gray-500">Country</label>
-                                <p className="text-gray-900">{profileData.country}</p>
+                                <label className="text-sm font-medium text-gray-500">
+                                    Country
+                                </label>
+                                <p className="text-gray-900">
+                                    {profileData.country}
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -167,16 +213,28 @@ const Profile = () => {
                         </h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             <div>
-                                <label className="text-sm font-medium text-gray-500">Name</label>
-                                <p className="text-gray-900">{profileData.emergencyContact?.name}</p>
+                                <label className="text-sm font-medium text-gray-500">
+                                    Name
+                                </label>
+                                <p className="text-gray-900">
+                                    {profileData.emergencyContact?.name}
+                                </p>
                             </div>
                             <div>
-                                <label className="text-sm font-medium text-gray-500">Relationship</label>
-                                <p className="text-gray-900">{profileData.emergencyContact?.relationship}</p>
+                                <label className="text-sm font-medium text-gray-500">
+                                    Relationship
+                                </label>
+                                <p className="text-gray-900">
+                                    {profileData.emergencyContact?.relationship}
+                                </p>
                             </div>
                             <div>
-                                <label className="text-sm font-medium text-gray-500">Phone</label>
-                                <p className="text-gray-900">{profileData.emergencyContact?.phone}</p>
+                                <label className="text-sm font-medium text-gray-500">
+                                    Phone
+                                </label>
+                                <p className="text-gray-900">
+                                    {profileData.emergencyContact?.phone}
+                                </p>
                             </div>
                         </div>
                     </div>

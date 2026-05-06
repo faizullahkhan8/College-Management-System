@@ -14,12 +14,10 @@ const PaymentVerificationModal = ({
     if (!show || !selectedPayment) return null;
 
     return (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-gray-500/50 z-50 flex items-center justify-center p-4">
             <div className="bg-white rounded-xl shadow-xl max-w-lg w-full">
-                <div className="p-6 border-b flex justify-between items-center">
-                    <h2 className="text-xl font-bold">
-                        Verify Payment
-                    </h2>
+                <div className="p-6 border-b border-gray-300 flex justify-between items-center">
+                    <h2 className="text-xl font-bold">Verify Payment</h2>
                     <button
                         onClick={onClose}
                         className="p-2 hover:bg-gray-100 rounded-lg"
@@ -32,34 +30,26 @@ const PaymentVerificationModal = ({
                     {/* Payment Details */}
                     <div className="bg-gray-50 rounded-lg p-4 space-y-2">
                         <div className="flex justify-between">
-                            <span className="text-gray-600">
-                                Student:
-                            </span>
+                            <span className="text-gray-600">Student:</span>
                             <span className="font-medium">
                                 {selectedPayment.student?.firstName}{" "}
                                 {selectedPayment.student?.lastName}
                             </span>
                         </div>
                         <div className="flex justify-between">
-                            <span className="text-gray-600">
-                                Enrollment:
-                            </span>
+                            <span className="text-gray-600">Enrollment:</span>
                             <span className="font-medium">
                                 {selectedPayment.student?.enrollmentNo}
                             </span>
                         </div>
                         <div className="flex justify-between">
-                            <span className="text-gray-600">
-                                Fee Title:
-                            </span>
+                            <span className="text-gray-600">Fee Title:</span>
                             <span className="font-medium">
                                 {selectedPayment.feeStructure?.title}
                             </span>
                         </div>
                         <div className="flex justify-between">
-                            <span className="text-gray-600">
-                                Amount Paid:
-                            </span>
+                            <span className="text-gray-600">Amount Paid:</span>
                             <span className="font-semibold text-green-600">
                                 ₹{selectedPayment.amountPaid}
                             </span>
@@ -73,9 +63,7 @@ const PaymentVerificationModal = ({
                             </span>
                         </div>
                         <div className="flex justify-between">
-                            <span className="text-gray-600">
-                                Submitted:
-                            </span>
+                            <span className="text-gray-600">Submitted:</span>
                             <span className="font-medium">
                                 {new Date(
                                     selectedPayment.submittedAt,
@@ -109,7 +97,7 @@ const PaymentVerificationModal = ({
                             value={verificationRemarks}
                             onChange={onRemarksChange}
                             placeholder="Add any remarks..."
-                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                            className="w-full px-4 py-2 border-gray-300 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                             rows={3}
                         />
                     </div>
@@ -129,18 +117,14 @@ const PaymentVerificationModal = ({
                             onClick={() => onVerify("REJECTED")}
                             disabled={verificationLoading}
                         >
-                            {verificationLoading
-                                ? "Processing..."
-                                : "Reject"}
+                            {verificationLoading ? "Processing..." : "Reject"}
                         </CustomButton>
                         <CustomButton
                             className="flex-1"
                             onClick={() => onVerify("APPROVED")}
                             disabled={verificationLoading}
                         >
-                            {verificationLoading
-                                ? "Processing..."
-                                : "Approve"}
+                            {verificationLoading ? "Processing..." : "Approve"}
                         </CustomButton>
                     </div>
                 </div>

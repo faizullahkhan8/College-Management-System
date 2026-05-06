@@ -55,7 +55,12 @@ const StudentFees = () => {
         if (!file) return;
 
         // Validate file type
-        const allowedTypes = ["image/jpeg", "image/png", "image/jpg", "application/pdf"];
+        const allowedTypes = [
+            "image/jpeg",
+            "image/png",
+            "image/jpg",
+            "application/pdf",
+        ];
         if (!allowedTypes.includes(file.type)) {
             toast.error("Only JPG, PNG, and PDF files are allowed");
             return;
@@ -90,7 +95,9 @@ const StudentFees = () => {
         }
 
         if (!amountPaid || Number(amountPaid) < selectedFee.totalAmount) {
-            toast.error(`Minimum amount required is ₹${selectedFee.totalAmount}`);
+            toast.error(
+                `Minimum amount required is ₹${selectedFee.totalAmount}`,
+            );
             return;
         }
 
@@ -110,7 +117,9 @@ const StudentFees = () => {
             });
 
             if (response.data.success) {
-                toast.success("Payment submitted successfully! Awaiting verification.");
+                toast.success(
+                    "Payment submitted successfully! Awaiting verification.",
+                );
                 setShowPaymentModal(false);
                 setSelectedFee(null);
                 setReceiptFile(null);
@@ -119,7 +128,9 @@ const StudentFees = () => {
                 fetchFees();
             }
         } catch (error) {
-            toast.error(error.response?.data?.message || "Failed to submit payment");
+            toast.error(
+                error.response?.data?.message || "Failed to submit payment",
+            );
         } finally {
             setSubmitting(false);
         }
@@ -206,22 +217,30 @@ const StudentFees = () => {
             <Heading title="My Fees" />
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 my-8">
                 <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
                     <div className="text-sm text-gray-500">Total Fees</div>
-                    <div className="text-2xl font-bold text-gray-900">{stats.total}</div>
+                    <div className="text-2xl font-bold text-gray-900">
+                        {stats.total}
+                    </div>
                 </div>
                 <div className="bg-yellow-50 p-4 rounded-xl shadow-sm border border-yellow-100">
                     <div className="text-sm text-yellow-600">Pending</div>
-                    <div className="text-2xl font-bold text-yellow-700">{stats.pending}</div>
+                    <div className="text-2xl font-bold text-yellow-700">
+                        {stats.pending}
+                    </div>
                 </div>
                 <div className="bg-green-50 p-4 rounded-xl shadow-sm border border-green-100">
                     <div className="text-sm text-green-600">Paid</div>
-                    <div className="text-2xl font-bold text-green-700">{stats.paid}</div>
+                    <div className="text-2xl font-bold text-green-700">
+                        {stats.paid}
+                    </div>
                 </div>
                 <div className="bg-red-50 p-4 rounded-xl shadow-sm border border-red-100">
                     <div className="text-sm text-red-600">Overdue</div>
-                    <div className="text-2xl font-bold text-red-700">{stats.overdue}</div>
+                    <div className="text-2xl font-bold text-red-700">
+                        {stats.overdue}
+                    </div>
                 </div>
             </div>
 
@@ -259,10 +278,10 @@ const StudentFees = () => {
                                 fee.isLate && !fee.paymentStatus
                                     ? "border-red-200"
                                     : fee.paymentStatus === "APPROVED"
-                                    ? "border-green-200"
-                                    : fee.paymentStatus === "PENDING"
-                                    ? "border-yellow-200"
-                                    : "border-gray-100"
+                                      ? "border-green-200"
+                                      : fee.paymentStatus === "PENDING"
+                                        ? "border-yellow-200"
+                                        : "border-gray-100"
                             }`}
                         >
                             <div className="flex justify-between items-start mb-4">
@@ -281,12 +300,15 @@ const StudentFees = () => {
                                 <div className="flex items-center text-gray-600">
                                     <FiDollarSign className="mr-2" />
                                     <div>
-                                        <div className="text-sm text-gray-500">Amount</div>
+                                        <div className="text-sm text-gray-500">
+                                            Amount
+                                        </div>
                                         <div className="font-semibold">
                                             ₹{fee.amount}
                                             {fee.isLate && (
                                                 <span className="text-red-500 text-sm ml-1">
-                                                    + ₹{fee.lateFeeAmount} late fee
+                                                    + ₹{fee.lateFeeAmount} late
+                                                    fee
                                                 </span>
                                             )}
                                         </div>
@@ -295,7 +317,9 @@ const StudentFees = () => {
                                 <div className="flex items-center text-gray-600">
                                     <FiCalendar className="mr-2" />
                                     <div>
-                                        <div className="text-sm text-gray-500">Due Date</div>
+                                        <div className="text-sm text-gray-500">
+                                            Due Date
+                                        </div>
                                         <div
                                             className={`font-semibold ${
                                                 fee.isLate ? "text-red-600" : ""
@@ -310,7 +334,9 @@ const StudentFees = () => {
                             {/* Total Amount */}
                             <div className="bg-gray-50 rounded-lg p-3 mb-4">
                                 <div className="flex justify-between items-center">
-                                    <span className="text-gray-600">Total Amount Due</span>
+                                    <span className="text-gray-600">
+                                        Total Amount Due
+                                    </span>
                                     <span className="text-xl font-bold text-gray-900">
                                         ₹{fee.totalAmount}
                                     </span>
@@ -323,7 +349,9 @@ const StudentFees = () => {
                                     <CustomButton
                                         onClick={() => {
                                             setSelectedFee(fee);
-                                            setAmountPaid(fee.totalAmount.toString());
+                                            setAmountPaid(
+                                                fee.totalAmount.toString(),
+                                            );
                                             setShowPaymentModal(true);
                                         }}
                                         className="flex-1"
@@ -333,7 +361,11 @@ const StudentFees = () => {
                                     </CustomButton>
                                 )}
                                 {fee.paymentStatus === "PENDING" && (
-                                    <CustomButton variant="secondary" className="flex-1" disabled>
+                                    <CustomButton
+                                        variant="secondary"
+                                        className="flex-1"
+                                        disabled
+                                    >
                                         <FiClock className="mr-2" />
                                         Awaiting Verification
                                     </CustomButton>
@@ -343,14 +375,20 @@ const StudentFees = () => {
                                         <CustomButton
                                             variant="secondary"
                                             className="flex-1"
-                                            onClick={() => window.open(fee.receiptUrl, "_blank")}
+                                            onClick={() =>
+                                                window.open(
+                                                    fee.receiptUrl,
+                                                    "_blank",
+                                                )
+                                            }
                                         >
                                             <FiEye className="mr-2" />
                                             View Receipt
                                         </CustomButton>
                                         <div className="flex-1 bg-green-50 text-green-700 rounded-lg flex items-center justify-center">
                                             <FiCheckCircle className="mr-2" />
-                                            Verified on {formatDate(fee.verifiedAt)}
+                                            Verified on{" "}
+                                            {formatDate(fee.verifiedAt)}
                                         </div>
                                     </>
                                 )}
@@ -358,7 +396,9 @@ const StudentFees = () => {
                                     <CustomButton
                                         onClick={() => {
                                             setSelectedFee(fee);
-                                            setAmountPaid(fee.totalAmount.toString());
+                                            setAmountPaid(
+                                                fee.totalAmount.toString(),
+                                            );
                                             setShowPaymentModal(true);
                                         }}
                                         variant="danger"
@@ -380,7 +420,9 @@ const StudentFees = () => {
                 <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
                     <div className="bg-white rounded-xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
                         <div className="p-6 border-b flex justify-between items-center">
-                            <h2 className="text-xl font-bold">Submit Payment</h2>
+                            <h2 className="text-xl font-bold">
+                                Submit Payment
+                            </h2>
                             <button
                                 onClick={() => {
                                     setShowPaymentModal(false);
@@ -395,25 +437,34 @@ const StudentFees = () => {
                             </button>
                         </div>
 
-                        <form onSubmit={handleSubmitPayment} className="p-6 space-y-6">
+                        <form
+                            onSubmit={handleSubmitPayment}
+                            className="p-6 space-y-6"
+                        >
                             {/* Fee Details */}
                             <div className="bg-gray-50 rounded-lg p-4">
                                 <h3 className="font-semibold text-gray-900 mb-2">
                                     {selectedFee.title}
                                 </h3>
                                 <div className="flex justify-between text-sm">
-                                    <span className="text-gray-600">Base Amount:</span>
+                                    <span className="text-gray-600">
+                                        Base Amount:
+                                    </span>
                                     <span>₹{selectedFee.amount}</span>
                                 </div>
                                 {selectedFee.isLate && (
                                     <div className="flex justify-between text-sm text-red-600">
                                         <span>Late Fee:</span>
-                                        <span>₹{selectedFee.lateFeeAmount}</span>
+                                        <span>
+                                            ₹{selectedFee.lateFeeAmount}
+                                        </span>
                                     </div>
                                 )}
                                 <div className="flex justify-between font-bold text-lg mt-2 pt-2 border-t">
                                     <span>Total Due:</span>
-                                    <span className="text-green-600">₹{selectedFee.totalAmount}</span>
+                                    <span className="text-green-600">
+                                        ₹{selectedFee.totalAmount}
+                                    </span>
                                 </div>
                             </div>
 
@@ -425,9 +476,11 @@ const StudentFees = () => {
                                 <input
                                     type="number"
                                     value={amountPaid}
-                                    onChange={(e) => setAmountPaid(e.target.value)}
+                                    onChange={(e) =>
+                                        setAmountPaid(e.target.value)
+                                    }
                                     min={selectedFee.totalAmount}
-                                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                                    className="w-full px-4 py-2 border-gray-300 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                                     placeholder="Enter amount"
                                     required
                                 />
@@ -461,7 +514,10 @@ const StudentFees = () => {
                                             />
                                         ) : receiptFile ? (
                                             <div className="flex items-center text-gray-600">
-                                                <FiFileText className="mr-2" size={24} />
+                                                <FiFileText
+                                                    className="mr-2"
+                                                    size={24}
+                                                />
                                                 <span>{receiptFile.name}</span>
                                             </div>
                                         ) : (
@@ -512,7 +568,9 @@ const StudentFees = () => {
                                     className="flex-1"
                                     disabled={submitting || !receiptFile}
                                 >
-                                    {submitting ? "Submitting..." : "Submit Payment"}
+                                    {submitting
+                                        ? "Submitting..."
+                                        : "Submit Payment"}
                                 </CustomButton>
                             </div>
                         </form>

@@ -340,7 +340,7 @@ const AddMarks = () => {
                                 name="semester"
                                 value={selectedSemester || ""}
                                 onChange={handleInputChange}
-                                className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full px-4 py-2 border-gray-300 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                             >
                                 <option value="">Select Semester</option>
                                 {[1, 2, 3, 4, 5, 6, 7, 8].map((sem) => (
@@ -359,7 +359,7 @@ const AddMarks = () => {
                                 name="branch"
                                 value={selectedBranch?._id || ""}
                                 onChange={handleInputChange}
-                                className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full px-4 py-2 border-gray-300 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                             >
                                 <option value="">Select Branch</option>
                                 {branches?.map((branch) => (
@@ -379,7 +379,7 @@ const AddMarks = () => {
                                 value={selectedSubject?._id || ""}
                                 onChange={handleInputChange}
                                 disabled={!selectedBranch}
-                                className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                className={`w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                                     !selectedBranch
                                         ? "bg-gray-100 cursor-not-allowed"
                                         : ""
@@ -411,7 +411,7 @@ const AddMarks = () => {
                                 value={selectedExam?._id || ""}
                                 onChange={handleInputChange}
                                 disabled={!selectedSubject}
-                                className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                className={`w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                                     !selectedSubject
                                         ? "bg-gray-100 cursor-not-allowed"
                                         : ""
@@ -456,7 +456,7 @@ const AddMarks = () => {
                     <div className="space-y-4 w-full mb-6">
                         <div className="flex flex-col gap-4">
                             <div className="grid grid-cols-4 gap-4">
-                                <div className="border p-3 rounded-md shadow">
+                                <div className="border border-gray-300 p-3 rounded-md shadow">
                                     <span className="text-sm text-gray-500">
                                         Branch and Semester:
                                     </span>
@@ -466,7 +466,7 @@ const AddMarks = () => {
                                     </p>
                                 </div>
 
-                                <div className="border p-3 rounded-md shadow">
+                                <div className="border border-gray-300 p-3 rounded-md shadow">
                                     <span className="text-sm text-gray-500">
                                         Exam:
                                     </span>
@@ -474,7 +474,7 @@ const AddMarks = () => {
                                         {selectedExam?.name || "Not Selected"}
                                     </p>
                                 </div>
-                                <div className="border p-3 rounded-md shadow">
+                                <div className="border border-gray-300 p-3 rounded-md shadow">
                                     <span className="text-sm text-gray-500">
                                         Exam Type:
                                     </span>
@@ -484,7 +484,7 @@ const AddMarks = () => {
                                             : "End Term"}
                                     </p>
                                 </div>
-                                <div className="border p-3 rounded-md shadow">
+                                <div className="border border-gray-300 p-3 rounded-md shadow">
                                     <span className="text-sm text-gray-500">
                                         Subject:
                                     </span>
@@ -496,7 +496,7 @@ const AddMarks = () => {
                             </div>
 
                             <div className="grid grid-cols-4 gap-4">
-                                <div className="border p-3 rounded-md shadow">
+                                <div className="border border-gray-300 p-3 rounded-md shadow">
                                     <span className="text-sm text-gray-500">
                                         Total Marks:
                                     </span>
@@ -505,7 +505,7 @@ const AddMarks = () => {
                                             "Not Selected"}
                                     </p>
                                 </div>
-                                <div className="border p-3 rounded-md shadow">
+                                <div className="border border-gray-300 p-3 rounded-md shadow">
                                     <span className="text-sm text-gray-500">
                                         Date:
                                     </span>
@@ -517,7 +517,7 @@ const AddMarks = () => {
                                             : "Not Selected"}
                                     </p>
                                 </div>
-                                <div className="border p-3 rounded-md shadow">
+                                <div className="border border-gray-300 p-3 rounded-md shadow">
                                     <span className="text-sm text-gray-500">
                                         Time:
                                     </span>
@@ -525,7 +525,7 @@ const AddMarks = () => {
                                         {selectedExam?.time || "Not Selected"}
                                     </p>
                                 </div>
-                                <div className="border p-3 rounded-md shadow">
+                                <div className="border border-gray-300 p-3 rounded-md shadow">
                                     <span className="text-sm text-gray-500">
                                         Students:
                                     </span>
@@ -556,7 +556,7 @@ const AddMarks = () => {
                         />
                     </div>
 
-                    <div className="flex justify-between items-center mt-6 p-4 bg-gray-50 border rounded-lg">
+                    <div className="flex justify-between items-center mt-6 p-4 border border-gray-300 bg-gray-50  rounded-lg">
                         <div className="flex items-center gap-2">
                             <input
                                 type="checkbox"

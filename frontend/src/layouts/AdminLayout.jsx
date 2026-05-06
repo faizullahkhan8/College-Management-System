@@ -85,7 +85,7 @@ const AdminLayout = ({ children }) => {
                             {!collapsed && (
                                 <div>
                                     <h2 className="text-green-900 font-semibold text-lg">
-                                        Fees & Attandance Management System
+                                        Admin Portal
                                     </h2>
                                 </div>
                             )}
