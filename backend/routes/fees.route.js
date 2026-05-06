@@ -11,11 +11,13 @@ const {
     verifyPayment,
     deleteFeeStructure,
     toggleFeeStatus,
+    getFeeStructureDetails,
 } = require("../controllers/fees.controller");
 
 // Admin routes
 router.post("/", auth, createFeeStructure);
 router.get("/", auth, getAllFeeStructures);
+router.get("/:feeId/details", auth, getFeeStructureDetails);
 router.get("/payments", auth, getAllPayments);
 router.patch("/verify/:paymentId", auth, verifyPayment);
 router.delete("/:feeId", auth, deleteFeeStructure);

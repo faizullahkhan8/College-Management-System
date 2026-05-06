@@ -469,6 +469,146 @@ const toggleFeeStatus = async (req, res) => {
     }
 };
 
+// @desc    Get detailed fee structure with payment breakdown
+// @route   GET /api/fees/:feeId/details
+// @access  Admin only
+const getFeeStructureDetails = async (req, res) => {
+    try {
+        const { feeId } = req.params;
+
+        const feeStructure = await FeeStructure.findById(feeId)
+            .populate("targets.branches", "name")
+            .populate("targets.students", "firstName lastName enrollmentNo")
+            .populate("targets.groups", "name")
+            .populate("createdBy", "username");
+
+        if (!feeStructure) {
+            return res.status(404).json({
+                success: false,
+                message: "Fee structure not found",
+            });
+        }
+
+        // Get all targeted students based on fee structure's target type
+        let targetedStudents = [];
+
+        if (feeStructure.targetType === "ALL") {
+            const allStudents = await Student.find({});
+            targetedStudents = allStudents.map((s) => s._id);
+        } else if (feeStructure.targetType === "BRANCH") {
+            const studentsInBranches = await Student.find({
+                branchId: { $in: feeStructure.targets.branches },
+            });
+            targetedStudents = studentsInBranches.map((s) => s._id);
+        } else if (feeStructure.targetType === "SEMESTER") {
+            const studentsInSemesters = await Student.find({
+                semester: { $in: feeStructure.targets.semesters },
+            });
+            targetedStudents = studentsInSemesters.map((s) => s._id);
+        } else if (feeStructure.targetType === "INDIVIDUAL") {
+            targetedStudents = feeStructure.targets.students;
+        } else if (feeStructure.targetType === "GROUP") {
+            // Get students from groups
+            const groups = await StudentGroup.find({
+                _id: { $in: feeStructure.targets.groups },
+            });
+            const groupStudentIds = groups.flatMap((g) => g.students);
+            targetedStudents = groupStudentIds;
+        }
+
+        // Get all payments for this fee structure
+        const payments = await FeePayment.find({
+            feeStructure: feeId,
+            student: { $in: targetedStudents },
+        })
+            .populate(
+                "student",
+                "firstName lastName enrollmentNo branchId semester",
+            )
+            .populate("verifiedBy", "username")
+            .sort({ submittedAt: -1 });
+
+        // Calculate payment statistics
+        const totalTargeted = targetedStudents.length;
+        const paidStudents = payments.filter(
+            (p) => p.status === "APPROVED",
+        ).length;
+        const pendingStudents = payments.filter(
+            (p) => p.status === "PENDING",
+        ).length;
+        const rejectedStudents = payments.filter(
+            (p) => p.status === "REJECTED",
+        ).length;
+        const unpaidStudents = totalTargeted - payments.length;
+
+        // Calculate revenue
+        const totalRevenue = payments
+            .filter((p) => p.status === "APPROVED")
+            .reduce((sum, p) => sum + p.amountPaid, 0);
+
+        const expectedRevenue = totalTargeted * feeStructure.amount;
+        const pendingRevenue = payments
+            .filter((p) => p.status === "PENDING")
+            .reduce((sum, p) => sum + p.amountPaid, 0);
+
+        // Get detailed student list with payment status
+        const studentDetails = targetedStudents.map((studentId) => {
+            const payment = payments.find(
+                (p) => p.student._id.toString() === studentId.toString(),
+            );
+            const student = payment ? payment.student : null;
+
+            return {
+                studentId,
+                studentInfo: student,
+                paymentStatus: payment ? payment.status : "UNPAID",
+                amountPaid: payment ? payment.amountPaid : 0,
+                submittedAt: payment ? payment.submittedAt : null,
+                verifiedAt: payment ? payment.verifiedAt : null,
+                receiptUrl: payment ? payment.receiptUrl : null,
+                remarks: payment ? payment.remarks : null,
+            };
+        });
+
+        res.status(200).json({
+            success: true,
+            data: {
+                feeStructure,
+                statistics: {
+                    totalTargeted,
+                    paidStudents,
+                    pendingStudents,
+                    rejectedStudents,
+                    unpaidStudents,
+                    completionRate:
+                        totalTargeted > 0
+                            ? ((paidStudents / totalTargeted) * 100).toFixed(1)
+                            : 0,
+                },
+                revenue: {
+                    expectedRevenue,
+                    totalRevenue,
+                    pendingRevenue,
+                    collectionRate:
+                        expectedRevenue > 0
+                            ? ((totalRevenue / expectedRevenue) * 100).toFixed(
+                                  1,
+                              )
+                            : 0,
+                },
+                students: studentDetails,
+                recentPayments: payments.slice(0, 10), // Last 10 payments
+            },
+        });
+    } catch (error) {
+        console.error("Get fee structure details error:", error);
+        res.status(500).json({
+            success: false,
+            message: error.message || "Failed to fetch fee structure details",
+        });
+    }
+};
+
 module.exports = {
     createFeeStructure,
     getAllFeeStructures,
@@ -478,5 +618,6 @@ module.exports = {
     verifyPayment,
     deleteFeeStructure,
     toggleFeeStatus,
+    getFeeStructureDetails,
     calculateLateFee,
 };
