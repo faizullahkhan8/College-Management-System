@@ -13,6 +13,16 @@ app.use(
 
 app.use(express.json()); //to convert request data to json
 
+app.use(async (req, res, next) => {
+    try {
+        await connectToMongo();
+        next();
+    } catch (error) {
+        console.error("Database connection failed:", error);
+        res.status(500).json({ message: "Database connection failed" });
+    }
+});
+
 app.get("/", (req, res) => {
     res.send("Hello 👋 I am Working Fine 🚀");
 });
@@ -51,4 +61,8 @@ const startServer = async () => {
     }
 };
 
-startServer();
+if (require.main === module) {
+    startServer();
+}
+
+module.exports = app;
