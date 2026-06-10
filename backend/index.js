@@ -7,7 +7,7 @@ var cors = require("cors");
 
 app.use(
     cors({
-        origin: process.env.FRONTEND_API_LINK,
+        origin: "*", //process.env.FRONTEND_API_LINK,
     }),
 );
 
