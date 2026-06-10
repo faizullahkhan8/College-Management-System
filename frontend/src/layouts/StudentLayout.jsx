@@ -3,24 +3,27 @@ import { Sidebar, Menu, MenuItem } from "react-pro-sidebar";
 import {
     FiMenu,
     FiHome,
-    FiCalendar,
-    FiFileText,
+    FiBookOpen,
     FiBell,
-    FiClipboard,
+    FiDollarSign,
     FiLogOut,
     FiX,
     FiUser,
-    FiBook,
+    FiFileText,
+    FiCalendar,
+    FiClipboard,
     FiAward,
-    FiDollarSign,
 } from "react-icons/fi";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useTheme } from "../contexts/ThemeContext";
+import ThemeToggle from "../components/ThemeToggle";
 
 const StudentLayout = ({ children }) => {
     const [collapsed, setCollapsed] = useState(false);
     const [mobileOpen, setMobileOpen] = useState(false);
     const location = useLocation();
     const navigate = useNavigate();
+    const { isDark } = useTheme();
 
     const logout = () => {
         localStorage.removeItem("userToken");
@@ -53,7 +56,9 @@ const StudentLayout = ({ children }) => {
     const isActive = (path) => location.pathname === path;
 
     return (
-        <div className="h-screen flex bg-gray-50 overflow-hidden">
+        <div
+            className={`h-screen flex overflow-hidden ${isDark ? "bg-gray-900" : "bg-gray-50"}`}
+        >
             {/* Mobile Sidebar Overlay */}
             {mobileOpen && (
                 <div
@@ -68,17 +73,29 @@ const StudentLayout = ({ children }) => {
                     mobileOpen ? "translate-x-0" : "-translate-x-full"
                 }`}
             >
-                <Sidebar width="260px" className="h-screen bg-white shadow-xl">
-                    <div className="lg:hidden sticky top-0 z-30 bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between">
-                        <h1 className="text-xl font-bold text-green-600">
+                <Sidebar
+                    width="260px"
+                    className={`h-screen shadow-xl ${isDark ? "bg-gray-800" : "bg-white"}`}
+                >
+                    <div
+                        className={`lg:hidden sticky top-0 z-30 px-4 py-3 flex items-center justify-between border-b ${isDark ? "bg-gray-800 border-gray-700" : "bg-white border-slate-200"}`}
+                    >
+                        <h1
+                            className={`text-xl font-bold ${isDark ? "text-green-400" : "text-green-600"}`}
+                        >
                             Student Portal
                         </h1>
-                        <button
-                            onClick={() => setMobileOpen(false)}
-                            className="p-2 hover:bg-gray-100 rounded-lg"
-                        >
-                            <FiX className="w-5 h-5" />
-                        </button>
+                        <div className="flex items-center gap-2">
+                            <ThemeToggle />
+                            <button
+                                onClick={() => setMobileOpen(false)}
+                                className={`p-2 rounded-lg ${isDark ? "hover:bg-gray-700" : "hover:bg-gray-100"}`}
+                            >
+                                <FiX
+                                    className={`w-5 h-5 ${isDark ? "text-gray-300" : "text-gray-600"}`}
+                                />
+                            </button>
+                        </div>
                     </div>
                     <Menu className="mt-4">
                         {menuItems.map((item) => (
@@ -115,18 +132,27 @@ const StudentLayout = ({ children }) => {
                     collapsedWidth="80px"
                     className="h-screen bg-white shadow-lg"
                 >
-                    <div className="flex items-center justify-between p-4 border-b h-16">
+                    <div
+                        className={`flex items-center justify-between p-4 border-b h-16 ${isDark ? "border-gray-700" : "border-gray-200"}`}
+                    >
                         {!collapsed && (
-                            <h1 className="text-xl font-bold text-green-600 truncate">
+                            <h1
+                                className={`text-xl font-bold truncate ${isDark ? "text-green-400" : "text-green-600"}`}
+                            >
                                 Student Portal
                             </h1>
                         )}
-                        <button
-                            onClick={() => setCollapsed(!collapsed)}
-                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                        >
-                            <FiMenu className="w-5 h-5 text-gray-600" />
-                        </button>
+                        <div className="flex items-center gap-2">
+                            <ThemeToggle />
+                            <button
+                                onClick={() => setCollapsed(!collapsed)}
+                                className={`p-2 rounded-lg transition-colors ${isDark ? "hover:bg-gray-700" : "hover:bg-gray-100"}`}
+                            >
+                                <FiMenu
+                                    className={`w-5 h-5 ${isDark ? "text-gray-300" : "text-gray-600"}`}
+                                />
+                            </button>
+                        </div>
                     </div>
                     <Menu className="mt-4">
                         {menuItems.map((item) => (
@@ -157,20 +183,31 @@ const StudentLayout = ({ children }) => {
             {/* Main Content - Scrollable */}
             <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
                 {/* Mobile Header */}
-                <div className="lg:hidden bg-white shadow-sm p-4 flex items-center justify-between flex-shrink-0 z-30">
-                    <h1 className="text-lg font-bold text-green-600">
+                <div
+                    className={`lg:hidden shadow-sm p-4 flex items-center justify-between flex-shrink-0 z-30 ${isDark ? "bg-gray-800" : "bg-white"}`}
+                >
+                    <h1
+                        className={`text-lg font-bold ${isDark ? "text-green-400" : "text-green-600"}`}
+                    >
                         Student Portal
                     </h1>
-                    <button
-                        onClick={() => setMobileOpen(true)}
-                        className="p-2 hover:bg-gray-100 rounded-lg"
-                    >
-                        <FiMenu className="w-6 h-6" />
-                    </button>
+                    <div className="flex items-center gap-2">
+                        <ThemeToggle />
+                        <button
+                            onClick={() => setMobileOpen(true)}
+                            className={`p-2 rounded-lg ${isDark ? "hover:bg-gray-700" : "hover:bg-gray-100"}`}
+                        >
+                            <FiMenu
+                                className={`w-6 h-6 ${isDark ? "text-gray-300" : "text-gray-600"}`}
+                            />
+                        </button>
+                    </div>
                 </div>
 
                 {/* Page Content - Scrollable */}
-                <main className="flex-1 p-4 lg:p-8 overflow-y-auto">
+                <main
+                    className={`flex-1 p-4 lg:p-8 overflow-y-auto ${isDark ? "bg-gray-900 text-gray-100" : "bg-white text-gray-900"}`}
+                >
                     {children}
                 </main>
             </div>

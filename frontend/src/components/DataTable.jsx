@@ -5,6 +5,7 @@ import {
     getPaginationRowModel,
     flexRender,
 } from "@tanstack/react-table";
+import { useTheme } from "../contexts/ThemeContext";
 
 const DataTable = ({
     data,
@@ -13,6 +14,7 @@ const DataTable = ({
     emptyMessage = "No data found.",
     onRowClick,
 }) => {
+    const { isDark } = useTheme();
     const table = useReactTable({
         data,
         columns,
@@ -28,14 +30,21 @@ const DataTable = ({
     return (
         <div className="w-full">
             <div className="overflow-x-auto">
-                <table className="min-w-full bg-white border border-gray-300">
+                <table
+                    className={`min-w-full border ${isDark ? "bg-gray-800 border-gray-600" : "bg-white border-gray-300"}`}
+                >
                     <thead>
                         {table.getHeaderGroups().map((headerGroup) => (
-                            <tr key={headerGroup.id} className="bg-gray-100">
+                            <tr
+                                key={headerGroup.id}
+                                className={
+                                    isDark ? "bg-gray-700" : "bg-gray-100"
+                                }
+                            >
                                 {headerGroup.headers.map((header) => (
                                     <th
                                         key={header.id}
-                                        className="px-6 py-3 border-b border-gray-300 text-left"
+                                        className={`px-6 py-3 border-b text-left ${isDark ? "border-gray-600" : "border-gray-300"}`}
                                     >
                                         {header.isPlaceholder
                                             ? null
@@ -54,7 +63,7 @@ const DataTable = ({
                             table.getRowModel().rows.map((row) => (
                                 <tr
                                     key={row.id}
-                                    className={`hover:bg-gray-50 ${onRowClick ? "cursor-pointer" : ""}`}
+                                    className={`${isDark ? "hover:bg-gray-700" : "hover:bg-gray-50"} ${onRowClick ? "cursor-pointer" : ""}`}
                                     onClick={() =>
                                         onRowClick && onRowClick(row.original)
                                     }
@@ -62,7 +71,7 @@ const DataTable = ({
                                     {row.getVisibleCells().map((cell) => (
                                         <td
                                             key={cell.id}
-                                            className="px-6 py-4 border-b border-gray-300"
+                                            className={`px-6 py-4 border-b ${isDark ? "border-gray-600" : "border-gray-300"}`}
                                         >
                                             {flexRender(
                                                 cell.column.columnDef.cell,
@@ -76,7 +85,7 @@ const DataTable = ({
                             <tr>
                                 <td
                                     colSpan={columns.length}
-                                    className="px-6 py-8 text-center text-gray-500"
+                                    className={`px-6 py-8 text-center ${isDark ? "text-gray-400" : "text-gray-500"}`}
                                 >
                                     {emptyMessage}
                                 </td>
@@ -87,7 +96,9 @@ const DataTable = ({
             </div>
 
             <div className="flex items-center justify-between mt-4">
-                <p className="text-sm text-gray-600">
+                <p
+                    className={`text-sm ${isDark ? "text-gray-400" : "text-gray-600"}`}
+                >
                     Page {table.getState().pagination.pageIndex + 1} of{" "}
                     {Math.max(table.getPageCount(), 1)}
                 </p>
@@ -95,14 +106,14 @@ const DataTable = ({
                     <button
                         onClick={() => table.previousPage()}
                         disabled={!table.getCanPreviousPage()}
-                        className="px-3 py-1.5 rounded border border-gray-300 disabled:opacity-40"
+                        className={`px-3 py-1.5 rounded border disabled:opacity-40 ${isDark ? "border-gray-600" : "border-gray-300"}`}
                     >
                         Previous
                     </button>
                     <button
                         onClick={() => table.nextPage()}
                         disabled={!table.getCanNextPage()}
-                        className="px-3 py-1.5 rounded border border-gray-300 disabled:opacity-40"
+                        className={`px-3 py-1.5 rounded border disabled:opacity-40 ${isDark ? "border-gray-600" : "border-gray-300"}`}
                     >
                         Next
                     </button>

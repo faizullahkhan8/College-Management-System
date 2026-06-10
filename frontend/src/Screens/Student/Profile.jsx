@@ -7,6 +7,7 @@ import Heading from "../../components/Heading";
 import Loading from "../../components/Loading";
 import axiosWrapper from "../../utils/AxiosWrapper";
 import { setUserData } from "../../redux/actions";
+import { useTheme } from "../../contexts/ThemeContext";
 
 const Profile = () => {
     const [showPasswordUpdate, setShowPasswordUpdate] = useState(false);
@@ -14,6 +15,7 @@ const Profile = () => {
     const dispatch = useDispatch();
     const userData = useSelector((state) => state.userData);
     const userToken = localStorage.getItem("userToken");
+    const { isDark } = useTheme();
 
     useEffect(() => {
         const fetchUserDetails = async () => {
@@ -60,24 +62,34 @@ const Profile = () => {
     };
 
     return (
-        <div className="w-full mx-auto flex flex-col mb-10">
+        <div
+            className={`w-full mx-auto flex flex-col mb-10 ${isDark ? "text-gray-100" : "text-gray-900"}`}
+        >
             <div className="max-w-7xl mx-auto w-full">
                 {/* Header Section */}
-                <div className="flex items-center gap-8 mb-12 border-b border-gray-300 pb-8 justify-between">
+                <div
+                    className={`flex items-center gap-8 mb-12 pb-8 justify-between border-b ${isDark ? "border-gray-700" : "border-gray-300"}`}
+                >
                     <div className="flex items-center gap-8">
                         <img
                             src={profileData.profile}
                             alt="Profile"
-                            className="w-40 h-40 rounded-full object-cover ring-2 ring-green-500 ring-offset-4"
+                            className={`w-40 h-40 rounded-full object-cover ring-2 ${isDark ? "ring-green-400 ring-offset-gray-900" : "ring-green-500 ring-offset-white"} ring-offset-4`}
                         />
                         <div>
-                            <h1 className="text-4xl font-bold text-gray-900 mb-2">
+                            <h1
+                                className={`text-4xl font-bold mb-2 ${isDark ? "text-gray-100" : "text-gray-900"}`}
+                            >
                                 {`${profileData.firstName} ${profileData.middleName} ${profileData.lastName}`}
                             </h1>
-                            <p className="text-lg text-gray-600 mb-1">
+                            <p
+                                className={`text-lg mb-1 ${isDark ? "text-gray-300" : "text-gray-600"}`}
+                            >
                                 {profileData.enrollmentNo}
                             </p>
-                            <p className="text-lg text-green-600 font-bold">
+                            <p
+                                className={`text-lg font-bold ${isDark ? "text-green-400" : "text-green-600"}`}
+                            >
                                 {profileData.branchId?.name}
                             </p>
                         </div>
@@ -101,56 +113,76 @@ const Profile = () => {
 
                 <div className="grid grid-cols-1 gap-12">
                     {/* Personal Information */}
-                    <div className="bg-white rounded-lg shadow-lg p-6">
-                        <h2 className="text-2xl font-bold text-orange-500 mb-6 pb-2 border-b border-gray-200">
+                    <div
+                        className={`rounded-lg shadow-lg p-6 ${isDark ? "bg-gray-800" : "bg-white"}`}
+                    >
+                        <h2
+                            className={`text-2xl font-bold mb-6 pb-2 border-b ${isDark ? "text-orange-400 border-gray-700" : "text-orange-500 border-gray-200"}`}
+                        >
                             Personal Information
                         </h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             <div>
-                                <label className="text-sm font-medium text-gray-500">
+                                <label
+                                    className={`text-sm font-medium ${isDark ? "text-gray-400" : "text-gray-500"}`}
+                                >
                                     Email
                                 </label>
-                                <p className="text-gray-900">
+                                <p
+                                    className={
+                                        isDark
+                                            ? "text-gray-100"
+                                            : "text-gray-900"
+                                    }
+                                >
                                     {profileData.email}
                                 </p>
                             </div>
                             <div>
-                                <label className="text-sm font-medium text-gray-500">
+                                <label
+                                    className={`text-sm font-medium ${isDark ? "text-gray-400" : "text-gray-500"}`}
+                                >
                                     Phone
                                 </label>
-                                <p className="text-gray-900">
-                                    {profileData.phone}
-                                </p>
-                            </div>
-                            <div>
-                                <label className="text-sm font-medium text-gray-500">
-                                    Gender
-                                </label>
-                                <p className="text-gray-900 capitalize">
-                                    {profileData.gender}
-                                </p>
-                            </div>
-                            <div>
-                                <label className="text-sm font-medium text-gray-500">
-                                    Blood Group
-                                </label>
-                                <p className="text-gray-900">
+                                <p
+                                    className={
+                                        isDark
+                                            ? "text-gray-100"
+                                            : "text-gray-900"
+                                    }
+                                >
                                     {profileData.bloodGroup}
                                 </p>
                             </div>
                             <div>
-                                <label className="text-sm font-medium text-gray-500">
+                                <label
+                                    className={`text-sm font-medium ${isDark ? "text-gray-400" : "text-gray-500"}`}
+                                >
                                     Date of Birth
                                 </label>
-                                <p className="text-gray-900">
+                                <p
+                                    className={
+                                        isDark
+                                            ? "text-gray-100"
+                                            : "text-gray-900"
+                                    }
+                                >
                                     {formatDate(profileData.dob)}
                                 </p>
                             </div>
                             <div>
-                                <label className="text-sm font-medium text-gray-500">
+                                <label
+                                    className={`text-sm font-medium ${isDark ? "text-gray-400" : "text-gray-500"}`}
+                                >
                                     Semester
                                 </label>
-                                <p className="text-gray-900">
+                                <p
+                                    className={
+                                        isDark
+                                            ? "text-gray-100"
+                                            : "text-gray-900"
+                                    }
+                                >
                                     {profileData.semester}
                                 </p>
                             </div>
@@ -158,8 +190,12 @@ const Profile = () => {
                     </div>
 
                     {/* Address Information */}
-                    <div className="bg-white rounded-lg shadow-lg p-6">
-                        <h2 className="text-2xl font-bold text-orange-500 mb-6 pb-2 border-b border-gray-200">
+                    <div
+                        className={`rounded-lg shadow-lg p-6 ${isDark ? "bg-gray-800" : "bg-white"}`}
+                    >
+                        <h2
+                            className={`text-2xl font-bold mb-6 pb-2 border-b ${isDark ? "text-orange-400 border-gray-700" : "text-orange-500 border-gray-200"}`}
+                        >
                             Address Information
                         </h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

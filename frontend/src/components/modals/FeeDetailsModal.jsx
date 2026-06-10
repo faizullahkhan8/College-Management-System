@@ -9,6 +9,7 @@ import {
     FiEye,
 } from "react-icons/fi";
 import Loading from "../Loading";
+import { useTheme } from "../../contexts/ThemeContext";
 
 const FeeDetailsModal = ({
     show,
@@ -19,16 +20,25 @@ const FeeDetailsModal = ({
     onFilterChange,
     formatDate,
 }) => {
+    const { isDark } = useTheme();
     if (!show) return null;
 
     return (
         <div className="fixed inset-0 bg-gray-500/50 z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-xl shadow-xl max-w-6xl w-full max-h-[90vh] overflow-y-auto">
-                <div className="p-6 border-b border-gray-300 flex justify-between items-center">
-                    <h2 className="text-xl font-bold">Fee Structure Details</h2>
+            <div
+                className={`rounded-xl shadow-xl max-w-6xl w-full max-h-[90vh] overflow-y-auto ${isDark ? "bg-gray-800" : "bg-white"}`}
+            >
+                <div
+                    className={`p-6 flex justify-between items-center border-b ${isDark ? "border-gray-700" : "border-gray-300"}`}
+                >
+                    <h2
+                        className={`text-xl font-bold ${isDark ? "text-gray-100" : "text-gray-900"}`}
+                    >
+                        Fee Structure Details
+                    </h2>
                     <button
                         onClick={onClose}
-                        className="p-2 hover:bg-gray-100 rounded-lg"
+                        className={`p-2 rounded-lg ${isDark ? "hover:bg-gray-700" : "hover:bg-gray-100"}`}
                     >
                         <FiX />
                     </button>
@@ -185,7 +195,9 @@ const FeeDetailsModal = ({
 
                             {/* Progress Bar */}
                             <div className="mt-4">
-                                <div className="w-full bg-gray-200 rounded-full h-3">
+                                <div
+                                    className={`w-full bg-${isDark ? "gray-700" : "gray-200"} rounded-full h-3`}
+                                >
                                     <div
                                         className="bg-green-500 h-3 rounded-full transition-all duration-300"
                                         style={{

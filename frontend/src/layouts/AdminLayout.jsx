@@ -12,12 +12,15 @@ import {
     FiDollarSign,
 } from "react-icons/fi";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useTheme } from "../contexts/ThemeContext";
+import ThemeToggle from "../components/ThemeToggle";
 
 const AdminLayout = ({ children }) => {
     const [collapsed, setCollapsed] = useState(false);
     const [mobileOpen, setMobileOpen] = useState(false);
     const location = useLocation();
     const navigate = useNavigate();
+    const { isDark } = useTheme();
 
     const logout = () => {
         localStorage.removeItem("userToken");
@@ -41,17 +44,26 @@ const AdminLayout = ({ children }) => {
     const isActive = (path) => location.pathname === path;
 
     return (
-        <div className="h-screen overflow-hidden bg-slate-100">
-            <div className="lg:hidden sticky top-0 z-30 bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between">
-                <span className="font-semibold text-slate-800">
+        <div
+            className={`h-screen overflow-hidden ${isDark ? "bg-gray-900" : "bg-slate-100"}`}
+        >
+            <div
+                className={`lg:hidden sticky top-0 z-30 px-4 py-3 flex items-center justify-between border-b ${isDark ? "bg-gray-800 border-gray-700" : "bg-white border-slate-200"}`}
+            >
+                <span
+                    className={`font-semibold ${isDark ? "text-gray-100" : "text-slate-800"}`}
+                >
                     Admin Panel
                 </span>
-                <button
-                    onClick={() => setMobileOpen((prev) => !prev)}
-                    className="p-2 rounded-lg border border-slate-300 text-slate-700"
-                >
-                    {mobileOpen ? <FiX /> : <FiMenu />}
-                </button>
+                <div className="flex items-center gap-2">
+                    <ThemeToggle />
+                    <button
+                        onClick={() => setMobileOpen((prev) => !prev)}
+                        className={`p-2 rounded-lg border ${isDark ? "border-gray-600 text-gray-300 hover:bg-gray-700" : "border-slate-300 text-slate-700 hover:bg-gray-100"}`}
+                    >
+                        {mobileOpen ? <FiX /> : <FiMenu />}
+                    </button>
+                </div>
             </div>
 
             {mobileOpen && (
@@ -71,30 +83,39 @@ const AdminLayout = ({ children }) => {
                 >
                     <Sidebar
                         collapsed={collapsed}
-                        backgroundColor="#f0fdf4"
+                        backgroundColor={isDark ? "#1f2937" : "#f0fdf4"}
                         width="280px"
                         collapsedWidth="88px"
                         rootStyles={{
-                            borderRight: "1px solid #bbf7d0",
+                            borderRight: `1px solid ${isDark ? "#374151" : "#bbf7d0"}`,
                             height: "100vh",
                             position: "sticky",
                             top: 0,
                         }}
                     >
-                        <div className="px-4 py-5 border-b border-green-200 flex items-center justify-between">
+                        <div
+                            className={`px-4 py-5 flex items-center justify-between border-b ${isDark ? "border-gray-700" : "border-green-200"}`}
+                        >
                             {!collapsed && (
                                 <div>
-                                    <h2 className="text-green-900 font-semibold text-lg">
+                                    <h2
+                                        className={`font-semibold text-lg ${isDark ? "text-green-400" : "text-green-900"}`}
+                                    >
                                         Admin Portal
                                     </h2>
                                 </div>
                             )}
-                            <button
-                                onClick={() => setCollapsed((prev) => !prev)}
-                                className="text-green-700 hover:text-green-900 p-2 rounded-md hover:bg-green-100"
-                            >
-                                <FiMenu />
-                            </button>
+                            <div className="flex items-center gap-2">
+                                <ThemeToggle />
+                                <button
+                                    onClick={() =>
+                                        setCollapsed((prev) => !prev)
+                                    }
+                                    className={`p-2 rounded-md transition-colors ${isDark ? "text-green-400 hover:bg-gray-700" : "text-green-700 hover:bg-green-100"}`}
+                                >
+                                    <FiMenu />
+                                </button>
+                            </div>
                         </div>
 
                         <div className="px-3 py-4">
@@ -139,15 +160,22 @@ const AdminLayout = ({ children }) => {
                             <Menu
                                 menuItemStyles={{
                                     button: {
+                                        ":hover": {
+                                            backgroundColor: "#ff0000aa",
+                                        },
                                         borderRadius: "12px",
                                         color: "#b91c1c",
-                                        backgroundColor: "#fef2f2",
+                                        backgroundColor: "#ff000090",
                                         padding: "12px 14px",
                                         fontWeight: 600,
                                     },
                                 }}
                             >
-                                <MenuItem icon={<FiLogOut />} onClick={logout}>
+                                <MenuItem
+                                    style={{ color: "white" }}
+                                    icon={<FiLogOut />}
+                                    onClick={logout}
+                                >
                                     Logout
                                 </MenuItem>
                             </Menu>
@@ -155,7 +183,9 @@ const AdminLayout = ({ children }) => {
                     </Sidebar>
                 </div>
 
-                <main className="flex-1 h-full overflow-y-auto overflow-x-auto p-4 md:p-6 lg:p-8 w-full">
+                <main
+                    className={`flex-1 h-full overflow-y-auto overflow-x-auto p-4 md:p-6 lg:p-8 w-full ${isDark ? "bg-gray-900 text-gray-100" : "bg-white text-gray-900"}`}
+                >
                     {children}
                 </main>
             </div>

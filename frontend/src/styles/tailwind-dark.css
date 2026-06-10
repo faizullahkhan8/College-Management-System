@@ -1,0 +1,122 @@
+@import "tailwindcss";
+
+/* Custom theme variables */
+:root {
+    --bg-primary: 249 250 251; /* gray-50 */
+    --bg-secondary: 255 255 255; /* white */
+    --bg-tertiary: 243 244 246; /* gray-100 */
+    --text-primary: 17 24 39; /* gray-900 */
+    --text-secondary: 107 114 128; /* gray-500 */
+    --text-tertiary: 156 163 175; /* gray-400 */
+    --border-primary: 229 231 235; /* gray-200 */
+    --border-secondary: 209 213 219; /* gray-300 */
+    --accent-green: 34 197 94; /* green-500 */
+    --accent-green-light: 134 239 172; /* green-300 */
+    --accent-green-dark: 22 163 74; /* green-600 */
+}
+
+.dark {
+    --bg-primary: 17 24 39; /* gray-900 */
+    --bg-secondary: 31 41 55; /* gray-800 */
+    --bg-tertiary: 55 65 81; /* gray-700 */
+    --text-primary: 243 244 246; /* gray-100 */
+    --text-secondary: 156 163 175; /* gray-400 */
+    --text-tertiary: 107 114 128; /* gray-500 */
+    --border-primary: 55 65 81; /* gray-700 */
+    --border-secondary: 75 85 99; /* gray-600 */
+    --accent-green: 34 197 94; /* green-500 */
+    --accent-green-light: 22 163 74; /* green-600 */
+    --accent-green-dark: 134 239 172; /* green-300 */
+}
+
+/* Custom utilities */
+.bg-primary {
+    background-color: rgb(var(--bg-primary));
+}
+
+.bg-secondary {
+    background-color: rgb(var(--bg-secondary));
+}
+
+.bg-tertiary {
+    background-color: rgb(var(--bg-tertiary));
+}
+
+.text-primary {
+    color: rgb(var(--text-primary));
+}
+
+.text-secondary {
+    color: rgb(var(--text-secondary));
+}
+
+.text-tertiary {
+    color: rgb(var(--text-tertiary));
+}
+
+.border-primary {
+    border-color: rgb(var(--border-primary));
+}
+
+.border-secondary {
+    border-color: rgb(var(--border-secondary));
+}
+
+/* Dark mode specific styles */
+.dark .dark\:bg-primary {
+    background-color: rgb(var(--bg-primary));
+}
+
+.dark .dark\:bg-secondary {
+    background-color: rgb(var(--bg-secondary));
+}
+
+.dark .dark\:bg-tertiary {
+    background-color: rgb(var(--bg-tertiary));
+}
+
+.dark .dark\:text-primary {
+    color: rgb(var(--text-primary));
+}
+
+.dark .dark\:text-secondary {
+    color: rgb(var(--text-secondary));
+}
+
+.dark .dark\:text-tertiary {
+    color: rgb(var(--text-tertiary));
+}
+
+.dark .dark\:border-primary {
+    border-color: rgb(var(--border-primary));
+}
+
+.dark .dark\:border-secondary {
+    border-color: rgb(var(--border-secondary));
+}
+
+/* Smooth transitions */
+* {
+    transition:
+        background-color 0.3s ease,
+        border-color 0.3s ease,
+        color 0.3s ease;
+}
+
+/* Scrollbar styling for dark mode */
+.dark ::-webkit-scrollbar {
+    width: 8px;
+}
+
+.dark ::-webkit-scrollbar-track {
+    background: rgb(var(--bg-tertiary));
+}
+
+.dark ::-webkit-scrollbar-thumb {
+    background: rgb(var(--border-secondary));
+    border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+    background: rgb(var(--text-secondary));
+}
