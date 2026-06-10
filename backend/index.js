@@ -2,8 +2,7 @@ const connectToMongo = require("./Database/db.js");
 const express = require("express");
 const app = express();
 const path = require("path");
-connectToMongo();
-const port = 4000 || process.env.PORT;
+const port = process.env.PORT || 4000;
 var cors = require("cors");
 
 app.use(
@@ -40,6 +39,16 @@ app.use(
     express.static(path.join(__dirname, "uploads", "receipts")),
 );
 
-app.listen(port, () => {
-    console.log(`Server Listening On http://localhost:${port}`);
-});
+const startServer = async () => {
+    try {
+        await connectToMongo();
+        app.listen(port, () => {
+            console.log(`Server listening on port ${port}`);
+        });
+    } catch (error) {
+        console.error("Failed to start server:", error);
+        process.exit(1);
+    }
+};
+
+startServer();
