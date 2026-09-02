@@ -94,7 +94,7 @@ const getStudentsForAttendanceController = async (req, res) => {
             .sort({ enrollmentNo: 1 });
 
         if (!students || students.length === 0) {
-            return ApiResponse.notFound("No students found for the selected class").send(res);
+            return ApiResponse.success([], "No students found for the selected class").send(res);
         }
 
         const attendanceDate = new Date(date);

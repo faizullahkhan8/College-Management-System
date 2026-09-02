@@ -11,7 +11,7 @@ const {
 
 router.get("/", auth, getMaterialsController);
 router.post("/", auth, upload.single("file"), addMaterialController);
-router.put("/:id", auth, upload.single("file"), updateMaterialController);
-router.delete("/:id", auth, deleteMaterialController);
+router.put("/:id([0-9a-fA-F]{24})", auth, upload.single("file"), updateMaterialController);
+router.delete("/:id([0-9a-fA-F]{24})", auth, deleteMaterialController);
 
 module.exports = router;

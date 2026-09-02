@@ -20,6 +20,8 @@ import UpdatePassword from "./Screens/UpdatePassword";
 import AdminHome from "./Screens/Admin/Home";
 import Student from "./Screens/Admin/Student";
 import Faculty from "./Screens/Admin/Faculty";
+import AddEditFaculty from "./Screens/Admin/AddEditFaculty";
+import AddEditStudent from "./Screens/Admin/AddEditStudent";
 import Subject from "./Screens/Admin/Subject";
 import Branch from "./Screens/Admin/Branch";
 import AdminProfile from "./Screens/Admin/Profile";
@@ -51,7 +53,7 @@ const App = () => {
         <Provider store={mystore}>
             <ThemeProvider>
                 <Router>
-                    <Toaster position="top-center" reverseOrder={false} />
+                    <Toaster position="top-right" reverseOrder={false} />
 
                     <Routes>
                         {/* ---------- PUBLIC ROUTES ---------- */}
@@ -131,6 +133,46 @@ const App = () => {
                                 <ProtectedRoute>
                                     <AdminLayout>
                                         <AdminFees />
+                                    </AdminLayout>
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/admin/faculty/add"
+                            element={
+                                <ProtectedRoute>
+                                    <AdminLayout>
+                                        <AddEditFaculty />
+                                    </AdminLayout>
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/admin/faculty/edit/:id"
+                            element={
+                                <ProtectedRoute>
+                                    <AdminLayout>
+                                        <AddEditFaculty />
+                                    </AdminLayout>
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/admin/student/add"
+                            element={
+                                <ProtectedRoute>
+                                    <AdminLayout>
+                                        <AddEditStudent />
+                                    </AdminLayout>
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/admin/student/edit/:id"
+                            element={
+                                <ProtectedRoute>
+                                    <AdminLayout>
+                                        <AddEditStudent />
                                     </AdminLayout>
                                 </ProtectedRoute>
                             }

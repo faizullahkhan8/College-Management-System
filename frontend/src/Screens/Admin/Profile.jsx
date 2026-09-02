@@ -386,29 +386,29 @@ const Profile = ({ profileData }) => {
             )}
 
             <div className="grid grid-cols-1 gap-12">
-                <div className="bg-white rounded-lg shadow-lg p-6">
-                    <h2 className="text-2xl font-bold text-orange-500 mb-6 pb-2 border-b border-gray-200">
+                <div className={`rounded-lg shadow-lg p-6 ${isDark ? "bg-gray-800" : "bg-white"}`}>
+                    <h2 className={`text-2xl font-bold mb-6 pb-2 border-b ${isDark ? "text-orange-400 border-gray-700" : "text-orange-500 border-gray-200"}`}>
                         Personal Information
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         <div>
-                            <label className="text-sm font-medium text-gray-500">
+                            <label className={`text-sm font-medium ${isDark ? "text-gray-400" : "text-gray-500"}`}>
                                 Email
                             </label>
-                            <p className="text-gray-900">
+                            <p className={`font-medium ${isDark ? "text-gray-200" : "text-gray-900"}`}>
                                 {resolvedProfileData.email}
                             </p>
                         </div>
                         <div>
-                            <label className="text-sm font-medium text-gray-500">
+                            <label className={`text-sm font-medium ${isDark ? "text-gray-400" : "text-gray-500"}`}>
                                 Phone
                             </label>
-                            <p className="text-gray-900">
+                            <p className={`font-medium ${isDark ? "text-gray-200" : "text-gray-900"}`}>
                                 {resolvedProfileData.phone}
                             </p>
                         </div>
                         <div>
-                            <label className="text-sm font-medium text-gray-500">
+                            <label className={`text-sm font-medium ${isDark ? "text-gray-400" : "text-gray-500"}`}>
                                 Gender
                             </label>
                             <p className="text-gray-900 capitalize">
@@ -416,41 +416,41 @@ const Profile = ({ profileData }) => {
                             </p>
                         </div>
                         <div>
-                            <label className="text-sm font-medium text-gray-500">
+                            <label className={`text-sm font-medium ${isDark ? "text-gray-400" : "text-gray-500"}`}>
                                 Blood Group
                             </label>
-                            <p className="text-gray-900">
+                            <p className={`font-medium ${isDark ? "text-gray-200" : "text-gray-900"}`}>
                                 {resolvedProfileData.bloodGroup}
                             </p>
                         </div>
                         <div>
-                            <label className="text-sm font-medium text-gray-500">
+                            <label className={`text-sm font-medium ${isDark ? "text-gray-400" : "text-gray-500"}`}>
                                 Date of Birth
                             </label>
-                            <p className="text-gray-900">
+                            <p className={`font-medium ${isDark ? "text-gray-200" : "text-gray-900"}`}>
                                 {formatDate(resolvedProfileData.dob)}
                             </p>
                         </div>
                         <div>
-                            <label className="text-sm font-medium text-gray-500">
+                            <label className={`text-sm font-medium ${isDark ? "text-gray-400" : "text-gray-500"}`}>
                                 Joining Date
                             </label>
-                            <p className="text-gray-900">
+                            <p className={`font-medium ${isDark ? "text-gray-200" : "text-gray-900"}`}>
                                 {formatDate(resolvedProfileData.joiningDate)}
                             </p>
                         </div>
                         <div>
-                            <label className="text-sm font-medium text-gray-500">
+                            <label className={`text-sm font-medium ${isDark ? "text-gray-400" : "text-gray-500"}`}>
                                 Salary
                             </label>
-                            <p className="text-gray-900">
+                            <p className={`font-medium ${isDark ? "text-gray-200" : "text-gray-900"}`}>
                                 {resolvedProfileData.salary
                                     ? `Rs ${resolvedProfileData.salary.toLocaleString()}`
                                     : "-"}
                             </p>
                         </div>
                         <div>
-                            <label className="text-sm font-medium text-gray-500">
+                            <label className={`text-sm font-medium ${isDark ? "text-gray-400" : "text-gray-500"}`}>
                                 Status
                             </label>
                             <p className="text-gray-900 capitalize">
@@ -458,7 +458,7 @@ const Profile = ({ profileData }) => {
                             </p>
                         </div>
                         <div>
-                            <label className="text-sm font-medium text-gray-500">
+                            <label className={`text-sm font-medium ${isDark ? "text-gray-400" : "text-gray-500"}`}>
                                 Role
                             </label>
                             <p className="text-gray-900 capitalize">
@@ -470,82 +470,82 @@ const Profile = ({ profileData }) => {
                     </div>
                 </div>
 
-                <div className="bg-white rounded-lg shadow-lg p-6">
-                    <h2 className="text-2xl font-bold text-orange-500 mb-6 pb-2 border-b border-gray-200">
+                <div className={`rounded-lg shadow-lg p-6 ${isDark ? "bg-gray-800" : "bg-white"}`}>
+                    <h2 className={`text-2xl font-bold mb-6 pb-2 border-b ${isDark ? "text-orange-400 border-gray-700" : "text-orange-500 border-gray-200"}`}>
                         Address Information
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         <div>
-                            <label className="text-sm font-medium text-gray-500">
+                            <label className={`text-sm font-medium ${isDark ? "text-gray-400" : "text-gray-500"}`}>
                                 Address
                             </label>
-                            <p className="text-gray-900">
+                            <p className={`font-medium ${isDark ? "text-gray-200" : "text-gray-900"}`}>
                                 {resolvedProfileData.address}
                             </p>
                         </div>
                         <div>
-                            <label className="text-sm font-medium text-gray-500">
+                            <label className={`text-sm font-medium ${isDark ? "text-gray-400" : "text-gray-500"}`}>
                                 City
                             </label>
-                            <p className="text-gray-900">
+                            <p className={`font-medium ${isDark ? "text-gray-200" : "text-gray-900"}`}>
                                 {resolvedProfileData.city}
                             </p>
                         </div>
                         <div>
-                            <label className="text-sm font-medium text-gray-500">
+                            <label className={`text-sm font-medium ${isDark ? "text-gray-400" : "text-gray-500"}`}>
                                 State
                             </label>
-                            <p className="text-gray-900">
+                            <p className={`font-medium ${isDark ? "text-gray-200" : "text-gray-900"}`}>
                                 {resolvedProfileData.state}
                             </p>
                         </div>
                         <div>
-                            <label className="text-sm font-medium text-gray-500">
+                            <label className={`text-sm font-medium ${isDark ? "text-gray-400" : "text-gray-500"}`}>
                                 Pincode
                             </label>
-                            <p className="text-gray-900">
+                            <p className={`font-medium ${isDark ? "text-gray-200" : "text-gray-900"}`}>
                                 {resolvedProfileData.pincode}
                             </p>
                         </div>
                         <div>
-                            <label className="text-sm font-medium text-gray-500">
+                            <label className={`text-sm font-medium ${isDark ? "text-gray-400" : "text-gray-500"}`}>
                                 Country
                             </label>
-                            <p className="text-gray-900">
+                            <p className={`font-medium ${isDark ? "text-gray-200" : "text-gray-900"}`}>
                                 {resolvedProfileData.country}
                             </p>
                         </div>
                     </div>
                 </div>
 
-                <div className="bg-white rounded-lg shadow-lg p-6">
-                    <h2 className="text-2xl font-bold text-orange-500 mb-6 pb-2 border-b border-gray-200">
+                <div className={`rounded-lg shadow-lg p-6 ${isDark ? "bg-gray-800" : "bg-white"}`}>
+                    <h2 className={`text-2xl font-bold mb-6 pb-2 border-b ${isDark ? "text-orange-400 border-gray-700" : "text-orange-500 border-gray-200"}`}>
                         Emergency Contact
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         <div>
-                            <label className="text-sm font-medium text-gray-500">
+                            <label className={`text-sm font-medium ${isDark ? "text-gray-400" : "text-gray-500"}`}>
                                 Name
                             </label>
-                            <p className="text-gray-900">
+                            <p className={`font-medium ${isDark ? "text-gray-200" : "text-gray-900"}`}>
                                 {resolvedProfileData.emergencyContact?.name ||
                                     "-"}
                             </p>
                         </div>
                         <div>
-                            <label className="text-sm font-medium text-gray-500">
+                            <label className={`text-sm font-medium ${isDark ? "text-gray-400" : "text-gray-500"}`}>
                                 Relationship
                             </label>
-                            <p className="text-gray-900">
+                            <p className={`font-medium ${isDark ? "text-gray-200" : "text-gray-900"}`}>
                                 {resolvedProfileData.emergencyContact
                                     ?.relationship || "-"}
                             </p>
                         </div>
                         <div>
-                            <label className="text-sm font-medium text-gray-500">
+                            <label className={`text-sm font-medium ${isDark ? "text-gray-400" : "text-gray-500"}`}>
                                 Phone
                             </label>
-                            <p className="text-gray-900">
+                            <p className={`font-medium ${isDark ? "text-gray-200" : "text-gray-900"}`}>
                                 {resolvedProfileData.emergencyContact?.phone ||
                                     "-"}
                             </p>

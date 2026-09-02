@@ -5,7 +5,7 @@ const getNoticeController = async (req, res) => {
   try {
     const notices = await Notice.find();
     if (!notices || notices.length === 0) {
-      return ApiResponse.error("No Notices Found", 404).send(res);
+      return ApiResponse.success([], "No Notices Found").send(res);
     }
     return ApiResponse.success(notices, "All Notices Loaded!").send(res);
   } catch (error) {
@@ -53,7 +53,7 @@ const updateNoticeController = async (req, res) => {
     });
 
     if (!notice) {
-      return ApiResponse.error("Notice Not Found!", 404).send(res);
+      return ApiResponse.notFound("Notice Not Found!").send(res);
     }
 
     return ApiResponse.success(notice, "Notice Updated Successfully!").send(
@@ -72,7 +72,7 @@ const deleteNoticeController = async (req, res) => {
 
     let notice = await Notice.findByIdAndDelete(req.params.id);
     if (!notice) {
-      return ApiResponse.error("Notice Not Found!", 404).send(res);
+      return ApiResponse.notFound("Notice Not Found!").send(res);
     }
     return ApiResponse.success(null, "Notice Deleted Successfully!").send(res);
   } catch (error) {

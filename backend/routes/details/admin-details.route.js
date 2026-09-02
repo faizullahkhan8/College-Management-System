@@ -19,8 +19,8 @@ router.post("/login", loginAdminController);
 router.get("/my-details", auth, getMyDetailsController);
 
 router.get("/", auth, getAllDetailsController);
-router.patch("/:id", auth, upload.single("file"), updateDetailsController);
-router.delete("/:id", auth, deleteDetailsController);
+router.patch("/:id([0-9a-fA-F]{24})([0-9a-fA-F]{24})", auth, upload.single("file"), updateDetailsController);
+router.delete("/:id([0-9a-fA-F]{24})([0-9a-fA-F]{24})", auth, deleteDetailsController);
 router.post("/forget-password", sendForgetPasswordEmail);
 router.post("/update-password/:resetId", updatePasswordHandler);
 router.post("/change-password", auth, updateLoggedInPasswordController);

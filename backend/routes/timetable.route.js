@@ -14,8 +14,8 @@ router.get("/", auth, getTimetableController);
 
 router.post("/", auth, upload.single("file"), addTimetableController);
 
-router.put("/:id", auth, upload.single("file"), updateTimetableController);
+router.put("/:id([0-9a-fA-F]{24})", auth, upload.single("file"), updateTimetableController);
 
-router.delete("/:id", auth, deleteTimetableController);
+router.delete("/:id([0-9a-fA-F]{24})", auth, deleteTimetableController);
 
 module.exports = router;

@@ -510,10 +510,16 @@ const AdminFees = () => {
             {/* Tabs */}
             <div className="flex justify-between my-8">
                 <div className="flex gap-2">
-                    <CustomButton onClick={() => setActiveTab("fees")}>
+                    <CustomButton 
+                        onClick={() => setActiveTab("fees")}
+                        variant={activeTab === "fees" ? "primary" : "secondary"}
+                    >
                         Fee Structures
                     </CustomButton>
-                    <CustomButton onClick={() => setActiveTab("verify")}>
+                    <CustomButton 
+                        onClick={() => setActiveTab("verify")}
+                        variant={activeTab === "verify" ? "primary" : "secondary"}
+                    >
                         Verify Payments
                         {payments.filter((p) => p.status === "PENDING").length >
                             0 && (

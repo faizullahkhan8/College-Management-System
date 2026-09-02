@@ -9,7 +9,7 @@ const getSubjectController = async (req, res) => {
     if (semester) query.semester = semester;
     let subjects = await Subject.find(query).populate("branch");
     if (!subjects || subjects.length === 0) {
-      return ApiResponse.error("No Subjects Found", 404).send(res);
+      return ApiResponse.success([], "No Subjects Found").send(res);
     }
     return ApiResponse.success(subjects, "All Subjects Loaded!").send(res);
   } catch (error) {
@@ -66,7 +66,7 @@ const updateSubjectController = async (req, res) => {
     });
 
     if (!subject) {
-      return ApiResponse.error("Subject Not Found!", 404).send(res);
+      return ApiResponse.notFound("Subject Not Found!").send(res);
     }
 
     return ApiResponse.success(subject, "Subject Updated Successfully!").send(
@@ -85,7 +85,7 @@ const deleteSubjectController = async (req, res) => {
 
     let subject = await Subject.findByIdAndDelete(req.params.id);
     if (!subject) {
-      return ApiResponse.error("Subject Not Found!", 404).send(res);
+      return ApiResponse.notFound("Subject Not Found!").send(res);
     }
     return ApiResponse.success(null, "Subject Deleted Successfully!").send(res);
   } catch (error) {
@@ -110,7 +110,7 @@ const searchSubjectController = async (req, res) => {
 
     const subjects = await Subject.find(query).populate("branch");
     if (!subjects || subjects.length === 0) {
-      return ApiResponse.error("No subjects found", 404).send(res);
+      return ApiResponse.success([], "No subjects found").send(res);
     }
 
     return ApiResponse.success(subjects, "Subjects found successfully").send(

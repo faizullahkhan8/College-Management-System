@@ -26,6 +26,9 @@ const Branch = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [dataLoading, setDataLoading] = useState(false);
     const [hasSearched, setHasSearched] = useState(false);
+    const [searchLoading, setSearchLoading] = useState(false);
+    const [submitLoading, setSubmitLoading] = useState(false);
+    const [formErrors, setFormErrors] = useState({});
 
     useEffect(() => {
         getBranchHandler();
@@ -73,7 +76,7 @@ const Branch = () => {
             return;
         }
 
-        setDataLoading(true);
+        setSearchLoading(true);
         setHasSearched(true);
         toast.loading("Searching branches...");
         try {
@@ -102,7 +105,7 @@ const Branch = () => {
                 );
             }
         } finally {
-            setDataLoading(false);
+            setSearchLoading(false);
         }
     };
 
@@ -129,13 +132,18 @@ const Branch = () => {
         }
     };
 
-    const addBranchHandler = async () => {
-        if (!data.name || !data.branchId) {
-            toast.dismiss();
-            toast.error("Please fill all the fields");
+    const addBranchHandler = async (e) => {
+        e.preventDefault();
+        const errors = {};
+        if (!data.name.trim()) errors.name = "Branch name is required.";
+        if (!data.branchId.trim()) errors.branchId = "Branch ID is required.";
+        if (Object.keys(errors).length > 0) {
+            setFormErrors(errors);
             return;
         }
+        setFormErrors({});
         try {
+            setSubmitLoading(true);
             toast.loading(isEditing ? "Updating Branch" : "Adding Branch");
             const headers = {
                 "Content-Type": "application/json",
@@ -169,6 +177,8 @@ const Branch = () => {
         } catch (error) {
             toast.dismiss();
             toast.error(error.response?.data?.message || "Error");
+        } finally {
+            setSubmitLoading(false);
         }
     };
 
@@ -251,25 +261,20 @@ const Branch = () => {
     );
 
     return (
-        <div className="w-full mx-auto flex justify-center items-start flex-col mb-10 relative">
-            <Heading title="Branch Details" />
-            <CustomButton
-                onClick={() => {
-                    setShowAddForm(!showAddForm);
-                    if (!showAddForm) {
+        <div className="w-full mx-auto flex justify-center items-start flex-col mb-10">
+            <div className="flex justify-between items-center w-full">
+                <Heading title="Branch Details" />
+                <CustomButton
+                    onClick={() => {
+                        setShowAddForm(true);
                         setData({ name: "", branchId: "" });
                         setIsEditing(false);
                         setSelectedBranchId(null);
-                    }
-                }}
-                className="fixed bottom-8 right-8 !rounded-full !p-4"
-            >
-                {showAddForm ? (
-                    <IoMdClose className="text-3xl" />
-                ) : (
-                    <IoMdAdd className="text-3xl" />
-                )}
-            </CustomButton>
+                    }}
+                >
+                    <IoMdAdd className="text-2xl" />
+                </CustomButton>
+            </div>
 
             {dataLoading && <Loading />}
 
@@ -303,14 +308,17 @@ const Branch = () => {
                                     type="text"
                                     id="name"
                                     value={data.name}
-                                    onChange={(e) =>
-                                        setData({
-                                            ...data,
-                                            name: e.target.value,
-                                        })
-                                    }
-                                    className="w-full px-4 py-2 border-gray-300 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    onChange={(e) => {
+                                        setData({ ...data, name: e.target.value });
+                                        if (formErrors.name) setFormErrors((prev) => ({ ...prev, name: "" }));
+                                    }}
+                                    className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                        formErrors.name ? "border-red-500" : "border-gray-300"
+                                    }`}
                                 />
+                                {formErrors.name && (
+                                    <p className="text-red-500 text-xs mt-1">{formErrors.name}</p>
+                                )}
                             </div>
 
                             <div>
@@ -324,14 +332,17 @@ const Branch = () => {
                                     type="text"
                                     id="branchId"
                                     value={data.branchId}
-                                    onChange={(e) =>
-                                        setData({
-                                            ...data,
-                                            branchId: e.target.value,
-                                        })
-                                    }
-                                    className="w-full px-4 py-2 border-gray-300 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    onChange={(e) => {
+                                        setData({ ...data, branchId: e.target.value });
+                                        if (formErrors.branchId) setFormErrors((prev) => ({ ...prev, branchId: "" }));
+                                    }}
+                                    className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                        formErrors.branchId ? "border-red-500" : "border-gray-300"
+                                    }`}
                                 />
+                                {formErrors.branchId && (
+                                    <p className="text-red-500 text-xs mt-1">{formErrors.branchId}</p>
+                                )}
                             </div>
 
                             <div className="flex justify-end gap-4 pt-4 border-t">
@@ -342,10 +353,17 @@ const Branch = () => {
                                     Cancel
                                 </CustomButton>
                                 <CustomButton
+                                    type="submit"
                                     variant="primary"
-                                    onClick={addBranchHandler}
+                                    disabled={submitLoading}
                                 >
-                                    {isEditing ? "Update" : "Add"}
+                                    {submitLoading
+                                        ? isEditing
+                                            ? "Updating..."
+                                            : "Adding..."
+                                        : isEditing
+                                        ? "Update"
+                                        : "Add"}
                                 </CustomButton>
                             </div>
                         </form>
@@ -390,10 +408,10 @@ const Branch = () => {
                         <div className="mt-6 flex justify-center w-[10%] mx-auto">
                             <CustomButton
                                 type="submit"
-                                disabled={dataLoading}
+                                disabled={searchLoading}
                                 variant="primary"
                             >
-                                {dataLoading ? "Searching..." : "Search"}
+                                {searchLoading ? "Searching..." : "Search"}
                             </CustomButton>
                         </div>
                     </form>

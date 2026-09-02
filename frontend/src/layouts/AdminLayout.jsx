@@ -124,12 +124,15 @@ const AdminLayout = ({ children }) => {
                                     button: ({ active }) => ({
                                         marginBottom: "8px",
                                         borderRadius: "12px",
-                                        color: active ? "#ffffff" : "#166534",
+                                        color: active ? "#ffffff" : (isDark ? "#e5e7eb" : "#166534"),
                                         background: active
                                             ? "linear-gradient(90deg, #22c55e 0%, #16a34a 100%)"
                                             : "transparent",
                                         fontWeight: active ? 600 : 500,
                                         padding: "12px 14px",
+                                        "&:hover": {
+                                            backgroundColor: isDark ? "#374151" : "#dcfce7",
+                                        }
                                     }),
                                     icon: ({ active }) => ({
                                         color: active ? "#ffffff" : "#16a34a",

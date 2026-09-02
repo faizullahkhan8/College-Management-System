@@ -35,7 +35,10 @@ const Subject = () => {
     const [isEditing, setIsEditing] = useState(false);
     const userToken = localStorage.getItem("userToken");
     const [dataLoading, setDataLoading] = useState(false);
+    const [searchLoading, setSearchLoading] = useState(false);
+    const [submitLoading, setSubmitLoading] = useState(false);
     const [hasSearched, setHasSearched] = useState(false);
+    const [formErrors, setFormErrors] = useState({});
 
     useEffect(() => {
         getSubjectHandler();
@@ -90,7 +93,7 @@ const Subject = () => {
             return;
         }
 
-        setDataLoading(true);
+        setSearchLoading(true);
         setHasSearched(true);
         toast.loading("Searching subjects...");
         try {
@@ -118,7 +121,7 @@ const Subject = () => {
                 );
             }
         } finally {
-            setDataLoading(false);
+            setSearchLoading(false);
         }
     };
 
@@ -175,19 +178,19 @@ const Subject = () => {
     };
 
     const addSubjectHandler = async () => {
-        if (
-            !data.name ||
-            !data.code ||
-            !data.branch ||
-            !data.semester ||
-            !data.credits
-        ) {
-            toast.dismiss();
-            toast.error("Please fill all the fields");
+        const errors = {};
+        if (!data.name.trim()) errors.name = "Subject name is required.";
+        if (!data.code.trim()) errors.code = "Subject code is required.";
+        if (!data.branch) errors.branch = "Please select a branch.";
+        if (!data.semester) errors.semester = "Please select a semester.";
+        if (!data.credits || Number(data.credits) <= 0) errors.credits = "Credits must be a positive number.";
+        if (Object.keys(errors).length > 0) {
+            setFormErrors(errors);
             return;
         }
+        setFormErrors({});
         try {
-            setDataLoading(true);
+            setSubmitLoading(true);
             toast.loading(isEditing ? "Updating Subject" : "Adding Subject");
             const headers = {
                 "Content-Type": "application/json",
@@ -219,7 +222,7 @@ const Subject = () => {
             toast.dismiss();
             toast.error(error.response?.data?.message || "Error");
         } finally {
-            setDataLoading(false);
+            setSubmitLoading(false);
         }
     };
 
@@ -432,10 +435,10 @@ const Subject = () => {
                         <div className="mt-6 flex justify-center w-[10%] mx-auto">
                             <CustomButton
                                 type="submit"
-                                disabled={dataLoading}
+                                disabled={searchLoading}
                                 variant="primary"
                             >
-                                {dataLoading ? "Searching..." : "Search"}
+                                {searchLoading ? "Searching..." : "Search"}
                             </CustomButton>
                         </div>
                     </form>
@@ -457,7 +460,7 @@ const Subject = () => {
             )}
 
             {showModal && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
                     <div className="bg-white rounded-lg p-6 max-w-2xl w-full">
                         <div className="flex justify-between items-center mb-4">
                             <h2 className="text-xl font-semibold">
@@ -479,15 +482,15 @@ const Subject = () => {
                                 <input
                                     type="text"
                                     value={data.name}
-                                    onChange={(e) =>
-                                        setData({
-                                            ...data,
-                                            name: e.target.value,
-                                        })
-                                    }
-                                    className="w-full px-4 py-2 border-gray-300 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    required
+                                    onChange={(e) => {
+                                        setData({ ...data, name: e.target.value });
+                                        if (formErrors.name) setFormErrors((p) => ({ ...p, name: "" }));
+                                    }}
+                                    className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                        formErrors.name ? "border-red-500" : "border-gray-300"
+                                    }`}
                                 />
+                                {formErrors.name && <p className="text-red-500 text-xs mt-1">{formErrors.name}</p>}
                             </div>
 
                             <div>
@@ -497,15 +500,15 @@ const Subject = () => {
                                 <input
                                     type="text"
                                     value={data.code}
-                                    onChange={(e) =>
-                                        setData({
-                                            ...data,
-                                            code: e.target.value,
-                                        })
-                                    }
-                                    className="w-full px-4 py-2 border-gray-300 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    required
+                                    onChange={(e) => {
+                                        setData({ ...data, code: e.target.value });
+                                        if (formErrors.code) setFormErrors((p) => ({ ...p, code: "" }));
+                                    }}
+                                    className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                        formErrors.code ? "border-red-500" : "border-gray-300"
+                                    }`}
                                 />
+                                {formErrors.code && <p className="text-red-500 text-xs mt-1">{formErrors.code}</p>}
                             </div>
 
                             <div>
@@ -514,14 +517,13 @@ const Subject = () => {
                                 </label>
                                 <select
                                     value={data.branch}
-                                    onChange={(e) =>
-                                        setData({
-                                            ...data,
-                                            branch: e.target.value,
-                                        })
-                                    }
-                                    className="w-full px-4 py-2 border-gray-300 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    required
+                                    onChange={(e) => {
+                                        setData({ ...data, branch: e.target.value });
+                                        if (formErrors.branch) setFormErrors((p) => ({ ...p, branch: "" }));
+                                    }}
+                                    className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                        formErrors.branch ? "border-red-500" : "border-gray-300"
+                                    }`}
                                 >
                                     <option value="">Select Branch</option>
                                     {branch.map((item) => (
@@ -530,6 +532,7 @@ const Subject = () => {
                                         </option>
                                     ))}
                                 </select>
+                                {formErrors.branch && <p className="text-red-500 text-xs mt-1">{formErrors.branch}</p>}
                             </div>
 
                             <div>
@@ -538,14 +541,13 @@ const Subject = () => {
                                 </label>
                                 <select
                                     value={data.semester}
-                                    onChange={(e) =>
-                                        setData({
-                                            ...data,
-                                            semester: e.target.value,
-                                        })
-                                    }
-                                    className="w-full px-4 py-2 border-gray-300 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    required
+                                    onChange={(e) => {
+                                        setData({ ...data, semester: e.target.value });
+                                        if (formErrors.semester) setFormErrors((p) => ({ ...p, semester: "" }));
+                                    }}
+                                    className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                        formErrors.semester ? "border-red-500" : "border-gray-300"
+                                    }`}
                                 >
                                     <option value="">Select Semester</option>
                                     {[1, 2, 3, 4, 5, 6, 7, 8].map((sem) => (
@@ -554,6 +556,7 @@ const Subject = () => {
                                         </option>
                                     ))}
                                 </select>
+                                {formErrors.semester && <p className="text-red-500 text-xs mt-1">{formErrors.semester}</p>}
                             </div>
 
                             <div>
@@ -563,15 +566,16 @@ const Subject = () => {
                                 <input
                                     type="number"
                                     value={data.credits}
-                                    onChange={(e) =>
-                                        setData({
-                                            ...data,
-                                            credits: e.target.value,
-                                        })
-                                    }
-                                    className="w-full px-4 py-2 border-gray-300 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    required
+                                    onChange={(e) => {
+                                        setData({ ...data, credits: e.target.value });
+                                        if (formErrors.credits) setFormErrors((p) => ({ ...p, credits: "" }));
+                                    }}
+                                    className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                        formErrors.credits ? "border-red-500" : "border-gray-300"
+                                    }`}
+                                    min="1"
                                 />
+                                {formErrors.credits && <p className="text-red-500 text-xs mt-1">{formErrors.credits}</p>}
                             </div>
 
                             <div className="flex justify-end space-x-4 mt-6">
@@ -583,11 +587,15 @@ const Subject = () => {
                                 </CustomButton>
                                 <CustomButton
                                     onClick={addSubjectHandler}
-                                    disabled={dataLoading}
+                                    disabled={submitLoading}
                                 >
-                                    {isEditing
-                                        ? "Update Subject"
-                                        : "Add Subject"}
+                                    {submitLoading
+                                        ? isEditing
+                                            ? "Updating..."
+                                            : "Adding..."
+                                        : isEditing
+                                          ? "Update Subject"
+                                          : "Add Subject"}
                                 </CustomButton>
                             </div>
                         </div>

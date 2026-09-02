@@ -106,30 +106,60 @@ const FacultyLayout = ({ children }) => {
                             </button>
                         </div>
                     </div>
-                    <Menu className="mt-4">
+                    <Menu 
+                        className="mt-4"
+                        menuItemStyles={{
+                            button: ({ active }) => ({
+                                "&:hover": {
+                                    backgroundColor: isDark ? "#374151" : "#f3f4f6",
+                                    color: isDark ? "#34d399" : "#16a34a",
+                                },
+                                backgroundColor: active 
+                                    ? (isDark ? "#374151" : "#f0fdf4") 
+                                    : "transparent",
+                                color: active 
+                                    ? (isDark ? "#34d399" : "#16a34a") 
+                                    : (isDark ? "#d1d5db" : "#4b5563"),
+                                borderRight: active ? "4px solid #22c55e" : "none",
+                            }),
+                            icon: ({ active }) => ({
+                                color: active 
+                                    ? (isDark ? "#34d399" : "#16a34a") 
+                                    : (isDark ? "#9ca3af" : "#6b7280"),
+                            }),
+                        }}
+                    >
                         {menuItems.map((item) => (
                             <MenuItem
                                 key={item.to}
                                 icon={item.icon}
                                 component={<Link to={item.to} />}
                                 onClick={() => setMobileOpen(false)}
-                                className={
-                                    isActive(item.to)
-                                        ? "bg-green-50 text-green-600"
-                                        : "text-gray-600 hover:bg-gray-50"
-                                }
+                                active={isActive(item.to)}
                             >
                                 {item.label}
                             </MenuItem>
                         ))}
-                        <MenuItem
-                            icon={<FiLogOut />}
-                            onClick={logout}
-                            className="text-red-600 hover:bg-red-50 mt-4"
-                        >
-                            Logout
-                        </MenuItem>
                     </Menu>
+                    <div className="mt-auto px-4 py-4 border-t border-gray-200 dark:border-gray-700">
+                        <Menu
+                            menuItemStyles={{
+                                button: {
+                                    "&:hover": {
+                                        backgroundColor: isDark ? "#374151" : "#fef2f2",
+                                        color: isDark ? "#f87171" : "#dc2626",
+                                    },
+                                    color: isDark ? "#fca5a5" : "#dc2626",
+                                    borderRadius: "12px",
+                                },
+                                icon: { color: isDark ? "#fca5a5" : "#dc2626" },
+                            }}
+                        >
+                            <MenuItem icon={<FiLogOut />} onClick={logout}>
+                                Logout
+                            </MenuItem>
+                        </Menu>
+                    </div>
                 </Sidebar>
             </div>
 
@@ -139,7 +169,8 @@ const FacultyLayout = ({ children }) => {
                     collapsed={collapsed}
                     width="260px"
                     collapsedWidth="80px"
-                    className="h-screen bg-white shadow-lg"
+                    className={`h-screen shadow-lg ${isDark ? "bg-gray-800 text-white border-r border-gray-700" : "bg-white text-gray-800"}`}
+                    backgroundColor={isDark ? "#1f2937" : "#ffffff"}
                 >
                     <div
                         className={`flex items-center justify-between p-4 border-b h-16 ${isDark ? "border-gray-700" : "border-gray-200"}`}
@@ -163,29 +194,59 @@ const FacultyLayout = ({ children }) => {
                             </button>
                         </div>
                     </div>
-                    <Menu className="mt-4">
+                    <Menu 
+                        className="mt-4"
+                        menuItemStyles={{
+                            button: ({ active }) => ({
+                                "&:hover": {
+                                    backgroundColor: isDark ? "#374151" : "#f3f4f6",
+                                    color: isDark ? "#34d399" : "#16a34a",
+                                },
+                                backgroundColor: active 
+                                    ? (isDark ? "#374151" : "#f0fdf4") 
+                                    : "transparent",
+                                color: active 
+                                    ? (isDark ? "#34d399" : "#16a34a") 
+                                    : (isDark ? "#d1d5db" : "#4b5563"),
+                                borderRight: active ? "4px solid #22c55e" : "none",
+                            }),
+                            icon: ({ active }) => ({
+                                color: active 
+                                    ? (isDark ? "#34d399" : "#16a34a") 
+                                    : (isDark ? "#9ca3af" : "#6b7280"),
+                            }),
+                        }}
+                    >
                         {menuItems.map((item) => (
                             <MenuItem
                                 key={item.to}
                                 icon={item.icon}
                                 component={<Link to={item.to} />}
-                                className={
-                                    isActive(item.to)
-                                        ? "bg-green-50 text-green-600"
-                                        : "text-gray-600 hover:bg-gray-50"
-                                }
+                                active={isActive(item.to)}
                             >
                                 {item.label}
                             </MenuItem>
                         ))}
-                        <MenuItem
-                            icon={<FiLogOut />}
-                            onClick={logout}
-                            className="text-red-600 hover:bg-red-50 mt-4"
-                        >
-                            Logout
-                        </MenuItem>
                     </Menu>
+                    <div className="mt-auto px-4 py-4 border-t border-gray-200 dark:border-gray-700">
+                        <Menu
+                            menuItemStyles={{
+                                button: {
+                                    "&:hover": {
+                                        backgroundColor: isDark ? "#374151" : "#fef2f2",
+                                        color: isDark ? "#f87171" : "#dc2626",
+                                    },
+                                    color: isDark ? "#fca5a5" : "#dc2626",
+                                    borderRadius: "12px",
+                                },
+                                icon: { color: isDark ? "#fca5a5" : "#dc2626" },
+                            }}
+                        >
+                            <MenuItem icon={<FiLogOut />} onClick={logout}>
+                                Logout
+                            </MenuItem>
+                        </Menu>
+                    </div>
                 </Sidebar>
             </div>
 

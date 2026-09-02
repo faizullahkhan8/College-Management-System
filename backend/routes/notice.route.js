@@ -10,7 +10,7 @@ const router = express.Router();
 
 router.get("/", auth, getNoticeController);
 router.post("/", auth, addNoticeController);
-router.put("/:id", auth, updateNoticeController);
-router.delete("/:id", auth, deleteNoticeController);
+router.put("/:id([0-9a-fA-F]{24})", auth, updateNoticeController);
+router.delete("/:id([0-9a-fA-F]{24})", auth, deleteNoticeController);
 
 module.exports = router;

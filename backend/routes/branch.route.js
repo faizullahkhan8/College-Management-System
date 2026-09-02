@@ -12,7 +12,7 @@ const {
 router.get("/", auth, getBranchController);
 router.post("/search", auth, searchBranchController);
 router.post("/", auth, addBranchController);
-router.patch("/:id", auth, updateBranchController);
-router.delete("/:id", auth, deleteBranchController);
+router.patch("/:id([0-9a-fA-F]{24})", auth, updateBranchController);
+router.delete("/:id([0-9a-fA-F]{24})", auth, deleteBranchController);
 
 module.exports = router;

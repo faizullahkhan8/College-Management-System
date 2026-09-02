@@ -37,7 +37,7 @@ const getAllDetailsController = async (req, res, next) => {
     const users = await adminDetails.find().select("-__v -password");
 
     if (!users || users.length === 0) {
-      return ApiResponse.notFound("No Admin Found").send(res);
+      return ApiResponse.success([], "No Admin Found").send(res);
     }
 
     return ApiResponse.success(users, "Admin Details Found!").send(res);
@@ -119,6 +119,17 @@ const updateDetailsController = async (req, res, next) => {
     }
 
     const updateData = { ...req.body };
+    const emergencyContact = {};
+    for (const key in updateData) {
+      if (key.startsWith("emergencyContact[")) {
+        const subKey = key.match(/\[(.*?)\]/)[1];
+        emergencyContact[subKey] = updateData[key];
+        delete updateData[key];
+      }
+    }
+    if (Object.keys(emergencyContact).length > 0) {
+      updateData.emergencyContact = emergencyContact;
+    }
     const { email, phone, password } = updateData;
 
     if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -197,7 +208,7 @@ const deleteDetailsController = async (req, res, next) => {
     const user = await adminDetails.findById(req.params.id);
 
     if (!user) {
-      return ApiResponse.notFound("No Admin Found").send(res);
+      return ApiResponse.success([], "No Admin Found").send(res);
     }
 
     await adminDetails.findByIdAndDelete(req.params.id);
@@ -219,7 +230,7 @@ const sendForgetPasswordEmail = async (req, res) => {
     const user = await adminDetails.findOne({ email });
 
     if (!user) {
-      return ApiResponse.notFound("No Admin Found").send(res);
+      return ApiResponse.success([], "No Admin Found").send(res);
     }
     const resetTkn = jwt.sign(
       {

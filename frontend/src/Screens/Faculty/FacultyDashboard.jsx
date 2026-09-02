@@ -191,7 +191,7 @@ const FacultyDashboard = ({ profileData }) => {
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
           <h2 className="text-lg font-semibold text-slate-900 mb-4">Category Comparison</h2>
           <div className="h-72">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
               <BarChart data={chartData}>
                 <XAxis dataKey="name" tick={{ fill: "#475569", fontSize: 12 }} />
                 <YAxis tick={{ fill: "#475569", fontSize: 12 }} allowDecimals={false} />
@@ -212,7 +212,7 @@ const FacultyDashboard = ({ profileData }) => {
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
           <h2 className="text-lg font-semibold text-slate-900 mb-4">Distribution View</h2>
           <div className="h-72">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
               <PieChart>
                 <Pie
                   data={chartData}

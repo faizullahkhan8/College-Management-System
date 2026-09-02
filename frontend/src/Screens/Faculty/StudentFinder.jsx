@@ -1,4 +1,4 @@
-﻿import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import Heading from "../../components/Heading";
 import axiosWrapper from "../../utils/AxiosWrapper";
@@ -135,8 +135,11 @@ const StudentFinder = () => {
                         alt={`${row.original.firstName}'s profile`}
                         className="w-12 h-12 object-cover rounded-full"
                         onError={(e) => {
-                            e.currentTarget.src =
-                                "https://via.placeholder.com/48?text=User";
+                            if (!e.currentTarget.dataset.error) {
+                                e.currentTarget.dataset.error = "true";
+                                e.currentTarget.src =
+                                    "https://via.placeholder.com/48?text=User";
+                            }
                         }}
                     />
                 ),
@@ -298,8 +301,11 @@ const StudentFinder = () => {
                                         alt={`${selectedStudent.firstName}'s profile`}
                                         className="w-full h-auto object-cover rounded-lg"
                                         onError={(e) => {
-                                            e.target.src =
-                                                "https://images.unsplash.com/photo-1744315900478-fa44dc6a4e89?q=80&w=3087&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
+                                            if (!e.target.dataset.error) {
+                                                e.target.dataset.error = "true";
+                                                e.target.src =
+                                                    "https://images.unsplash.com/photo-1744315900478-fa44dc6a4e89?q=80&w=3087&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
+                                            }
                                         }}
                                     />
                                 </div>

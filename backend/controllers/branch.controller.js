@@ -12,7 +12,7 @@ const getBranchController = async (req, res, next) => {
       ],
     });
     if (!branches || branches.length === 0) {
-      return ApiResponse.error("No Branches Found", 404).send(res);
+      return ApiResponse.success([], "No Branches Found").send(res);
     }
 
     return ApiResponse.success(branches, "All Branches Loaded!").send(res);
@@ -67,7 +67,7 @@ const updateBranchController = async (req, res, next) => {
     });
 
     if (!branch) {
-      return ApiResponse.error("Branch Not Found!", 404).send(res);
+      return ApiResponse.notFound("Branch Not Found!").send(res);
     }
 
     return ApiResponse.success(branch, "Branch Updated Successfully!").send(
@@ -82,7 +82,7 @@ const deleteBranchController = async (req, res, next) => {
   try {
     let branch = await Branch.findById(req.params.id);
     if (!branch) {
-      return ApiResponse.error("Branch Not Found!", 404).send(res);
+      return ApiResponse.notFound("Branch Not Found!").send(res);
     }
 
     await Branch.findByIdAndDelete(req.params.id);
@@ -106,7 +106,7 @@ const searchBranchController = async (req, res) => {
 
     const branches = await Branch.find(query);
     if (!branches || branches.length === 0) {
-      return ApiResponse.error("No branches found", 404).send(res);
+      return ApiResponse.success([], "No branches found").send(res);
     }
 
     return ApiResponse.success(branches, "Branches found successfully").send(

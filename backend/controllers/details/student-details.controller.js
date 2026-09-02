@@ -40,12 +40,30 @@ const getAllDetailsController = async (req, res) => {
             .populate("branchId");
 
         if (!users || users.length === 0) {
-            return ApiResponse.notFound("No Student Found").send(res);
+            return ApiResponse.success([], "No Student Found").send(res);
         }
 
         return ApiResponse.success(users, "Student Details Found!").send(res);
     } catch (error) {
         console.error("Get Details Error: ", error);
+        return ApiResponse.internalServerError().send(res);
+    }
+};
+
+const getStudentByIdController = async (req, res) => {
+    try {
+        const user = await studentDetails
+            .findById(req.params.id)
+            .select("-__v -password")
+            .populate("branchId");
+
+        if (!user) {
+            return ApiResponse.notFound("Student Not Found").send(res);
+        }
+
+        return ApiResponse.success(user, "Student Details Found!").send(res);
+    } catch (error) {
+        console.error("Get Student By ID Error: ", error);
         return ApiResponse.internalServerError().send(res);
     }
 };
@@ -104,6 +122,17 @@ const updateDetailsController = async (req, res) => {
         }
 
         const updateData = { ...req.body };
+        const emergencyContact = {};
+        for (const key in updateData) {
+            if (key.startsWith("emergencyContact[")) {
+                const subKey = key.match(/\[(.*?)\]/)[1];
+                emergencyContact[subKey] = updateData[key];
+                delete updateData[key];
+            }
+        }
+        if (Object.keys(emergencyContact).length > 0) {
+            updateData.emergencyContact = emergencyContact;
+        }
         const { email, phone, password, enrollmentNo } = updateData;
 
         if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -201,7 +230,7 @@ const deleteDetailsController = async (req, res) => {
         const user = await studentDetails.findById(req.params.id);
 
         if (!user) {
-            return ApiResponse.notFound("No Student Found").send(res);
+            return ApiResponse.success([], "No Student Found").send(res);
         }
 
         await studentDetails.findByIdAndDelete(req.params.id);
@@ -223,7 +252,7 @@ const sendForgetPasswordEmail = async (req, res) => {
         const user = await studentDetails.findOne({ email });
 
         if (!user) {
-            return ApiResponse.notFound("No Student Found").send(res);
+            return ApiResponse.success([], "No Student Found").send(res);
         }
         const resetTkn = jwt.sign(
             {
@@ -333,7 +362,7 @@ const searchStudentsController = async (req, res) => {
             .sort({ enrollmentNo: 1 });
 
         if (!students || students.length === 0) {
-            return ApiResponse.notFound("No students found").send(res);
+            return ApiResponse.success([], "No students found").send(res);
         }
 
         return ApiResponse.success(
@@ -396,10 +425,11 @@ const updateLoggedInPasswordController = async (req, res) => {
 
 module.exports = {
     loginStudentController,
-    getAllDetailsController,
     registerStudentController,
     updateDetailsController,
     deleteDetailsController,
+    getAllDetailsController,
+    getStudentByIdController,
     getMyDetailsController,
     sendForgetPasswordEmail,
     updatePasswordHandler,

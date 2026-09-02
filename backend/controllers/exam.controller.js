@@ -13,7 +13,7 @@ const getAllExamsController = async (req, res) => {
     const exams = await Exam.find(query);
 
     if (!exams || exams.length === 0) {
-      return ApiResponse.error("No Exams Found", 404).send(res);
+      return ApiResponse.success([], "No Exams Found").send(res);
     }
 
     return ApiResponse.success(exams, "All Exams Loaded!").send(res);
@@ -59,9 +59,20 @@ const deleteExamController = async (req, res) => {
   }
 };
 
+const getUpcomingExamsController = async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 5;
+    const exams = await Exam.find().sort({ createdAt: -1 }).limit(limit);
+    return ApiResponse.success(exams || [], "Upcoming Exams Loaded!").send(res);
+  } catch (error) {
+    return ApiResponse.error(error.message).send(res);
+  }
+};
+
 module.exports = {
   getAllExamsController,
   addExamController,
   updateExamController,
   deleteExamController,
+  getUpcomingExamsController,
 };

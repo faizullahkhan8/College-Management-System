@@ -14,7 +14,7 @@ const getTimetableController = async (req, res) => {
             .sort({ createdAt: -1 });
 
         if (!timetables || timetables.length === 0) {
-            return ApiResponse.notFound("No timetables found").send(res);
+            return ApiResponse.success([], "No timetables found").send(res);
         }
 
         return ApiResponse.success(

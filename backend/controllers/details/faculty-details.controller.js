@@ -34,7 +34,7 @@ const getAllFacultyController = async (req, res) => {
   try {
     const users = await facultyDetails.find().select("-__v -password");
     if (!users || users.length === 0) {
-      return ApiResponse.notFound("No Faculty Found").send(res);
+      return ApiResponse.success([], "No Faculty Found").send(res);
     }
     return ApiResponse.success(users, "Faculty Details Found!").send(res);
   } catch (error) {
@@ -45,6 +45,34 @@ const getAllFacultyController = async (req, res) => {
 
 const generateEmployeeId = () => {
   return Math.floor(100000 + Math.random() * 900000);
+};
+
+const getFacultyByIdController = async (req, res) => {
+  try {
+    const user = await facultyDetails.findById(req.params.id).select("-__v -password");
+    if (!user) {
+      return ApiResponse.notFound("Faculty Not Found").send(res);
+    }
+    return ApiResponse.success(user, "Faculty Details Found!").send(res);
+  } catch (error) {
+    console.error("Get Faculty By ID Error: ", error);
+    return ApiResponse.internalServerError().send(res);
+  }
+};
+
+const getFacultySummaryController = async (req, res) => {
+  try {
+    const students = await require("../../models/details/student-details.model").countDocuments();
+    const subjects = await require("../../models/subject.model").countDocuments();
+    const exams = await require("../../models/exam.model").countDocuments();
+    const notices = await require("../../models/notice.model").countDocuments();
+
+    const summary = { students, subjects, exams, notices };
+    return ApiResponse.success(summary, "Faculty Summary Loaded!").send(res);
+  } catch (error) {
+    console.error("Faculty Summary Error:", error);
+    return ApiResponse.internalServerError().send(res);
+  }
 };
 
 const registerFacultyController = async (req, res) => {
@@ -183,7 +211,7 @@ const deleteFacultyController = async (req, res) => {
 
     const user = await facultyDetails.findByIdAndDelete(req.params.id);
     if (!user) {
-      return ApiResponse.notFound("No Faculty Found").send(res);
+      return ApiResponse.success([], "No Faculty Found").send(res);
     }
 
     return ApiResponse.success(null, "Deleted Successfully!").send(res);
@@ -217,7 +245,7 @@ const sendFacultyResetPasswordEmail = async (req, res) => {
 
     const user = await facultyDetails.findOne({ email });
     if (!user) {
-      return ApiResponse.notFound("No Faculty Found").send(res);
+      return ApiResponse.success([], "No Faculty Found").send(res);
     }
 
     const resetTkn = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
@@ -362,7 +390,7 @@ const searchFacultyController = async (req, res) => {
       .sort({ employeeId: 1 });
 
     if (!faculty || faculty.length === 0) {
-      return ApiResponse.notFound("No faculty found").send(res);
+      return ApiResponse.success([], "No faculty found").send(res);
     }
 
     return ApiResponse.success(faculty, "Faculty found successfully").send(res);
@@ -383,4 +411,6 @@ module.exports = {
   updateFacultyPasswordHandler,
   updateLoggedInPasswordController,
   searchFacultyController,
+  getFacultyByIdController,
+  getFacultySummaryController,
 };

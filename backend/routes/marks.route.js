@@ -16,6 +16,6 @@ router.get("/students", auth, getStudentsWithMarksController);
 router.get("/student", auth, getStudentMarksController);
 router.post("/", auth, addMarksController);
 router.post("/bulk", auth, addBulkMarksController);
-router.delete("/:id", auth, deleteMarksController);
+router.delete("/:id([0-9a-fA-F]{24})", auth, deleteMarksController);
 
 module.exports = router;
